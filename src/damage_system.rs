@@ -35,6 +35,10 @@ impl<'a> System<'a> for DamageSystem {
 
                 if stats.hit_points.current < 1 && dmg.1 {
                     xp_gain += stats.level * 100;
+                    if let Some(pos) = pos {
+                        let idx = map.xy_idx(pos.x, pos.y);
+                        crate::spatial::remove_entity(entity, idx);
+                    }
                 }
             }
         }

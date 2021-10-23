@@ -28,10 +28,10 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
         if pos.x + delta_x < 1 || pos.x + delta_x > map.width-1 || pos.y + delta_y < 1 || pos.y + delta_y > map.height-1 { return RunState::AwaitingInput; }
         let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
 
-        for potential_target in map.tile_content[destination_idx].iter() {
+        result = crate::spatial::for_each_tile_content_with_gamemode(destination_idx, |potential_target| {
             let mut hostile = true;
-            if combat_stats.get(*potential_target).is_some() {
-                if let Some(faction) = factions.get(*potential_target) {
+            if combat_stats.get(potential_target).is_some() {
+                if let Some(faction) = factions.get(potential_target) {
                     let reaction = crate::raws::faction_reaction(
                         &faction.name,
                         "Player",
@@ -42,7 +42,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
             }
             if !hostile {
                 // Note that we want to move the bystander
-                swap_entities.push((*potential_target, pos.x, pos.y));
+                swap_entities.push((potential_target, pos.x, pos.y));
 
                 // Move the player
                 pos.x = min(map.width-1 , max(0, pos.x + delta_x));
@@ -53,29 +53,34 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
                 let mut ppos = ecs.write_resource::<Point>();
                 ppos.x = pos.x;
                 ppos.y = pos.y;
+                return Some(RunState::Ticking);
             } else {
-                let target = combat_stats.get(*potential_target);
+                let target = combat_stats.get(potential_target);
                 if let Some(_target) = target {
-                    wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
-                    return RunState::Ticking;
+                    wants_to_melee.insert(entity, WantsToMelee{ target: potential_target }).expect("Add target failed");
+                    return Some(RunState::Ticking);
                 }
             }
-            let door = doors.get_mut(*potential_target);
+            let door = doors.get_mut(potential_target);
             if let Some(door) = door {
                 door.open = true;
-                blocks_visibility.remove(*potential_target);
-                blocks_movement.remove(*potential_target);
-                let glyph = renderables.get_mut(*potential_target).unwrap();
+                blocks_visibility.remove(potential_target);
+                blocks_movement.remove(potential_target);
+                let glyph = renderables.get_mut(potential_target).unwrap();
                 glyph.glyph = rltk::to_cp437('/');
                 viewshed.dirty = true;
-                result = RunState::Ticking;
+                return Some(RunState::Ticking);
             }
-        }
+            None
+        });
 
-        if !map.blocked[destination_idx] {
+        if !crate::spatial::is_blocked(destination_idx) {
+            let old_idx = map.xy_idx(pos.x, pos.y);
             pos.x = min(map.width-1 , max(0, pos.x + delta_x));
             pos.y = min(map.height-1, max(0, pos.y + delta_y));
+            let new_idx = map.xy_idx(pos.x, pos.y);
             entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
+            crate::spatial::move_entity(entity, old_idx, new_idx);
 
             viewshed.dirty = true;
             let mut ppos = ecs.write_resource::<Point>();
@@ -93,8 +98,12 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
     for m in swap_entities.iter() {
         let their_pos = positions.get_mut(m.0);
         if let Some(their_pos) = their_pos {
+            let old_idx = map.xy_idx(their_pos.x, their_pos.y);
             their_pos.x = m.1;
             their_pos.y = m.2;
+            let new_idx = map.xy_idx(their_pos.x, their_pos.y);
+            crate::spatial::move_entity(m.0, old_idx, new_idx);
+            result = RunState::Ticking;
         }
     }
 
@@ -162,8 +171,8 @@ fn skip_turn(ecs: &mut World) -> RunState {
     let viewshed = viewshed_components.get(*player_entity).unwrap();
     for tile in viewshed.visible_tiles.iter() {
         let idx = worldmap_resource.xy_idx(tile.x, tile.y);
-        for entity_id in worldmap_resource.tile_content[idx].iter() {
-            let faction = factions.get(*entity_id);
+        crate::spatial::for_each_tile_content(idx, |entity_id| {
+            let faction = factions.get(entity_id);
             match faction {
                 None => {}
                 Some(faction) => {
@@ -177,7 +186,7 @@ fn skip_turn(ecs: &mut World) -> RunState {
                     }
                 }
             }
-        }
+        });
     }
 
     let hunger_clocks = ecs.read_storage::<HungerClock>();
