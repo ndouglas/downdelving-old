@@ -33,7 +33,6 @@ pub fn apply_vertical_tunnel(map : &mut Map, y1:i32, y2:i32, x:i32) {
 
 /// Searches a map, removes unreachable areas and returns the most distant tile.
 pub fn remove_unreachable_areas_returning_most_distant(map : &mut Map, start_idx : usize) -> usize {
-    map.populate_blocked();
     let map_starts : Vec<usize> = vec![start_idx];
     let dijkstra_map = rltk::DijkstraMap::new(map.width as usize, map.height as usize, &map_starts , map, 300.0);
     let mut exit_tile = (0, 0.0f32);
@@ -83,3 +82,23 @@ pub fn generate_voronoi_spawn_regions(map: &Map, rng : &mut rltk::RandomNumberGe
 
     noise_areas
 }
+
+pub fn draw_corridor(map: &mut Map, x1:i32, y1:i32, x2:i32, y2:i32) {
+        let mut x = x1;
+        let mut y = y1;
+
+        while x != x2 || y != y2 {
+            if x < x2 {
+                x += 1;
+            } else if x > x2 {
+                x -= 1;
+            } else if y < y2 {
+                y += 1;
+            } else if y > y2 {
+                y -= 1;
+            }
+
+            let idx = map.xy_idx(x, y);
+            map.tiles[idx] = TileType::Floor;
+        }
+    }
