@@ -44,13 +44,39 @@ pub struct LightSource {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Monster {}
+pub struct Initiative {
+    pub current : i32
+}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Bystander {}
+pub struct MyTurn {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Vendor {}
+pub struct Faction {
+    pub name : String
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct WantsToApproach {
+    pub idx : i32
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct WantsToFlee {
+    pub indices : Vec<usize>
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+pub enum Movement {
+    Static,
+    Random,
+    RandomWaypoint{ path : Option<Vec<usize>> }
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct MoveMode {
+    pub mode : Movement
+}
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct Name {
@@ -102,6 +128,11 @@ pub struct WantsToMelee {
     pub target : Entity
 }
 
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct Chasing {
+    pub target : Entity
+}
+
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct SufferDamage {
     pub amount : Vec<(i32, bool)>,
@@ -122,12 +153,6 @@ impl SufferDamage {
 pub struct LootTable {
     pub table : String
 }
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Carnivore {}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Herbivore {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Item {}
