@@ -18,7 +18,6 @@ use map_indexing_system::MapIndexingSystem;
 mod melee_combat_system;
 use melee_combat_system::MeleeCombatSystem;
 mod damage_system;
-use damage_system::DamageSystem;
 mod gui;
 mod gamelog;
 mod spawner;
@@ -38,6 +37,7 @@ pub use gamesystem::*;
 mod lighting_system;
 mod ai;
 mod movement_system;
+pub mod effects;
 #[macro_use]
 extern crate lazy_static;
 pub mod spatial;
@@ -109,10 +109,10 @@ impl State {
         triggers.run_now(&self.ecs);
         let mut melee = MeleeCombatSystem{};
         melee.run_now(&self.ecs);
-        let mut damage = DamageSystem{};
-        damage.run_now(&self.ecs);
         let mut pickup = ItemCollectionSystem{};
         pickup.run_now(&self.ecs);
+        let mut itemequip = inventory_system::ItemEquipOnUse{};
+        itemequip.run_now(&self.ecs);
         let mut itemuse = ItemUseSystem{};
         itemuse.run_now(&self.ecs);
         let mut item_id = inventory_system::ItemIdentificationSystem{};
@@ -123,6 +123,7 @@ impl State {
         item_remove.run_now(&self.ecs);
         let mut hunger = hunger_system::HungerSystem{};
         hunger.run_now(&self.ecs);
+        effects::run_effects_queue(&mut self.ecs);
         let mut particles = particle_system::ParticleSpawnSystem{};
         particles.run_now(&self.ecs);
         let mut lighting = lighting_system::LightingSystem{};
@@ -473,7 +474,6 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Name>();
     gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<WantsToMelee>();
-    gs.ecs.register::<SufferDamage>();
     gs.ecs.register::<Item>();
     gs.ecs.register::<ProvidesHealing>();
     gs.ecs.register::<InflictsDamage>();
@@ -527,6 +527,8 @@ fn main() -> rltk::BError {
     gs.ecs.register::<MagicItem>();
     gs.ecs.register::<ObfuscatedName>();
     gs.ecs.register::<IdentifiedItem>();
+    gs.ecs.register::<SpawnParticleBurst>();
+    gs.ecs.register::<SpawnParticleLine>();
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
     raws::load_raws();

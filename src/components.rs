@@ -165,22 +165,6 @@ pub struct Chasing {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct SufferDamage {
-    pub amount : Vec<(i32, bool)>,
-}
-
-impl SufferDamage {
-    pub fn new_damage(store: &mut WriteStorage<SufferDamage>, victim: Entity, amount: i32, from_player: bool) {
-        if let Some(suffering) = store.get_mut(victim) {
-            suffering.amount.push((amount, from_player));
-        } else {
-            let dmg = SufferDamage { amount : vec![(amount, from_player)] };
-            store.insert(victim, dmg).expect("Unable to insert damage");
-        }
-    }
-}
-
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct LootTable {
     pub table : String
 }
@@ -315,6 +299,20 @@ pub struct NaturalAttackDefense {
 
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct ParticleLifetime {
+    pub lifetime_ms : f32
+}
+
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct SpawnParticleLine {
+    pub glyph : rltk::FontCharType,
+    pub color : RGB,
+    pub lifetime_ms : f32
+}
+
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct SpawnParticleBurst {
+    pub glyph : rltk::FontCharType,
+    pub color : RGB,
     pub lifetime_ms : f32
 }
 
