@@ -5,5 +5,7 @@ edition = "2021"
 authors = ["Nathan Douglas"]
 
 [dependencies]
-rltk = { version = "0.8.0" }
 getrandom = { version = "0.2", features = ["js"] }
+rltk = { version = "0.8.0" }
+specs = "0.16.1"
+specs-derive = "0.4.1"
