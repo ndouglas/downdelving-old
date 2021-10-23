@@ -168,6 +168,46 @@ pub fn get_vendor_items(categories: &[String], raws : &RawMaster) -> Vec<(String
     result
 }
 
+pub fn get_scroll_tags() -> Vec<String> {
+    let raws = &super::RAWS.lock().unwrap();
+    let mut result = Vec::new();
+
+    for item in raws.raws.items.iter() {
+        if let Some(magic) = &item.magic {
+            if &magic.naming == "scroll" {
+                result.push(item.name.clone());
+            }
+        }
+    }
+
+    result
+}
+
+pub fn get_potion_tags() -> Vec<String> {
+    let raws = &super::RAWS.lock().unwrap();
+    let mut result = Vec::new();
+
+    for item in raws.raws.items.iter() {
+        if let Some(magic) = &item.magic {
+            if &magic.naming == "potion" {
+                result.push(item.name.clone());
+            }
+        }
+    }
+
+    result
+}
+
+pub fn is_tag_magic(tag : &str) -> bool {
+    let raws = &super::RAWS.lock().unwrap();
+    if raws.item_index.contains_key(tag) {
+        let item_template = &raws.raws.items[raws.item_index[tag]];
+        item_template.magic.is_some()
+    } else {
+        false
+    }
+}
+
 fn spawn_position<'a>(pos : SpawnType, new_entity : EntityBuilder<'a>, tag : &str, raws: &RawMaster) -> EntityBuilder<'a> {
     let eb = new_entity;
 
@@ -208,6 +248,11 @@ pub fn spawn_named_item(raws: &RawMaster, ecs : &mut World, key : &str, pos : Sp
     if raws.item_index.contains_key(key) {
         let item_template = &raws.raws.items[raws.item_index[key]];
 
+        let dm = ecs.fetch::<crate::map::MasterDungeonMap>();
+        let scroll_names = dm.scroll_mappings.clone();
+        let potion_names = dm.potion_mappings.clone();
+        let identified = dm.identified_items.clone();
+        std::mem::drop(dm);
         let mut eb = ecs.create_entity().marked::<SimpleMarker<SerializeMe>>();
 
         // Spawn in the specified location
@@ -269,6 +314,29 @@ pub fn spawn_named_item(raws: &RawMaster, ecs : &mut World, key : &str, pos : Sp
             let slot = string_to_slot(&wearable.slot);
             eb = eb.with(Equippable{ slot });
             eb = eb.with(Wearable{ slot, armor_class: wearable.armor_class });
+        }
+
+        if let Some(magic) = &item_template.magic {
+            let class = match magic.class.as_str() {
+                "rare" => MagicItemClass::Rare,
+                "legendary" => MagicItemClass::Legendary,
+                _ => MagicItemClass::Common
+            };
+            eb = eb.with(MagicItem{ class });
+
+            if !identified.contains(&item_template.name) {
+                match magic.naming.as_str() {
+                    "scroll" => {
+                        eb = eb.with(ObfuscatedName{ name : scroll_names[&item_template.name].clone() });
+                    }
+                    "potion" => {
+                        eb = eb.with(ObfuscatedName{ name: potion_names[&item_template.name].clone() });
+                    }
+                    _ => {
+                        eb = eb.with(ObfuscatedName{ name : magic.naming.clone() });
+                    }
+                }
+            }
         }
 
         return Some(eb.build());

@@ -101,6 +101,16 @@ pub struct Name {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ObfuscatedName {
+    pub name : String
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct IdentifiedItem {
+    pub name : String
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct BlocksTile {}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -183,6 +193,14 @@ pub struct Item {
     pub initiative_penalty : f32,
     pub weight_lbs : f32,
     pub base_value : f32
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+pub enum MagicItemClass { Common, Rare, Legendary }
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct MagicItem {
+    pub class : MagicItemClass
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
