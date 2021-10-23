@@ -1,16 +1,18 @@
+use super::{gamelog::GameLog, CombatStats, Map, Name, Player, Position, RunState, SufferDamage};
 use specs::prelude::*;
-use super::{CombatStats, SufferDamage, Player, Name, gamelog::GameLog, RunState, Position, Map};
 
 pub struct DamageSystem {}
 
 impl<'a> System<'a> for DamageSystem {
-    type SystemData = ( WriteStorage<'a, CombatStats>,
-                        WriteStorage<'a, SufferDamage>,
-                        ReadStorage<'a, Position>,
-                        WriteExpect<'a, Map>,
-                        Entities<'a> );
+    type SystemData = (
+        WriteStorage<'a, CombatStats>,
+        WriteStorage<'a, SufferDamage>,
+        ReadStorage<'a, Position>,
+        WriteExpect<'a, Map>,
+        Entities<'a>,
+    );
 
-    fn run(&mut self, data : Self::SystemData) {
+    fn run(&mut self, data: Self::SystemData) {
         let (mut stats, mut damage, positions, mut map, entities) = data;
 
         for (entity, mut stats, damage) in (&entities, &mut stats, &damage).join() {
@@ -26,8 +28,8 @@ impl<'a> System<'a> for DamageSystem {
     }
 }
 
-pub fn delete_the_dead(ecs : &mut World) {
-    let mut dead : Vec<Entity> = Vec::new();
+pub fn delete_the_dead(ecs: &mut World) {
+    let mut dead: Vec<Entity> = Vec::new();
     // Using a scope to make the borrow checker happy
     {
         let combat_stats = ecs.read_storage::<CombatStats>();

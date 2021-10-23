@@ -1,21 +1,22 @@
+use super::{gamelog::GameLog, HungerClock, HungerState, RunState, SufferDamage};
 use specs::prelude::*;
-use super::{HungerClock, RunState, HungerState, SufferDamage, gamelog::GameLog};
 
 pub struct HungerSystem {}
 
 impl<'a> System<'a> for HungerSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
-                        Entities<'a>,
-                        WriteStorage<'a, HungerClock>,
-                        ReadExpect<'a, Entity>, // The player
-                        ReadExpect<'a, RunState>,
-                        WriteStorage<'a, SufferDamage>,
-                        WriteExpect<'a, GameLog>
-                      );
+        Entities<'a>,
+        WriteStorage<'a, HungerClock>,
+        ReadExpect<'a, Entity>, // The player
+        ReadExpect<'a, RunState>,
+        WriteStorage<'a, SufferDamage>,
+        WriteExpect<'a, GameLog>,
+    );
 
-    fn run(&mut self, data : Self::SystemData) {
-        let (entities, mut hunger_clock, player_entity, runstate, mut inflict_damage, mut log) = data;
+    fn run(&mut self, data: Self::SystemData) {
+        let (entities, mut hunger_clock, player_entity, runstate, mut inflict_damage, mut log) =
+            data;
 
         for (entity, mut clock) in (&entities, &mut hunger_clock).join() {
             let mut proceed = false;
@@ -31,7 +32,7 @@ impl<'a> System<'a> for HungerSystem {
                         proceed = false;
                     }
                 }
-                _ => proceed = false
+                _ => proceed = false,
             }
 
             if proceed {
