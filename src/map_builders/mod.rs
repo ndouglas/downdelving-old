@@ -27,6 +27,7 @@ mod room_draw;
 mod rooms_corridors_nearest;
 mod rooms_corridors_lines;
 mod room_corridor_spawner;
+mod door_placement;
 use distant_exit::DistantExit;
 use simple_map::SimpleMapBuilder;
 use bsp_dungeon::BspDungeonBuilder;
@@ -54,6 +55,7 @@ use room_draw::RoomDrawer;
 use rooms_corridors_nearest::NearestCorridors;
 use rooms_corridors_lines::StraightLineCorridors;
 use room_corridor_spawner::CorridorSpawner;
+use door_placement::DoorPlacement;
 
 pub struct BuilderMap {
     pub spawn_list : Vec<(usize, String)>,
@@ -266,12 +268,21 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator) -> 
 
     if rng.roll_dice(1, 3)==1 {
         builder.with(WaveformCollapseBuilder::new());
+
+        // Now set the start to a random starting area
+        let (start_x, start_y) = random_start_position(rng);
+        builder.with(AreaStartingPosition::new(start_x, start_y));
+
+        // Setup an exit and spawn mobs
+        builder.with(VoronoiSpawning::new());
+        builder.with(DistantExit::new());
     }
 
     if rng.roll_dice(1, 20)==1 {
         builder.with(PrefabBuilder::sectional(prefab_builder::prefab_sections::UNDERGROUND_FORT));
     }
 
+    builder.with(DoorPlacement::new());
     builder.with(PrefabBuilder::vaults());
 
     builder
