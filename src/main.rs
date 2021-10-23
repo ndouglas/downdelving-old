@@ -372,7 +372,6 @@ fn main() -> rltk::BError {
     let mut context = RltkBuilder::simple80x50()
         .with_title("Downdelving")
         .build()?;
-    context.with_post_scanlines(true);
     let mut gs = State {
         ecs: World::new()
     };
