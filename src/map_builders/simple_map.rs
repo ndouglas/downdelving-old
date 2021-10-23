@@ -1,4 +1,4 @@
-use super::{InitialMapBuilder, BuilderMap, Rect, apply_room_to_map };
+use super::{InitialMapBuilder, BuilderMap, Rect };
 use rltk::RandomNumberGenerator;
 
 pub struct SimpleMapBuilder {}
@@ -33,11 +33,7 @@ impl SimpleMapBuilder {
                 if new_room.intersect(other_room) { ok = false }
             }
             if ok {
-                apply_room_to_map(&mut build_data.map, &new_room);
-                build_data.take_snapshot();
-
                 rooms.push(new_room);
-                build_data.take_snapshot();
             }
         }
         build_data.rooms = Some(rooms);

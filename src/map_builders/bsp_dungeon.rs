@@ -1,4 +1,4 @@
-use super::{InitialMapBuilder, BuilderMap, Map, Rect, apply_room_to_map, TileType};
+use super::{InitialMapBuilder, BuilderMap, Rect, TileType};
 use rltk::RandomNumberGenerator;
 
 pub struct BspDungeonBuilder {
@@ -34,11 +34,10 @@ impl BspDungeonBuilder {
             let rect = self.get_random_rect(rng);
             let candidate = self.get_random_sub_rect(rect, rng);
 
-            if self.is_possible(candidate, &build_data.map) {
-                apply_room_to_map(&mut build_data.map, &candidate);
+            if self.is_possible(candidate, &build_data, &rooms) {
+                //apply_room_to_map(&mut build_data.map, &candidate);
                 rooms.push(candidate);
                 self.add_subrects(rect);
-                build_data.take_snapshot();
             }
 
             n_rooms += 1;
@@ -85,8 +84,8 @@ impl BspDungeonBuilder {
         let rect_width = i32::abs(rect.x1 - rect.x2);
         let rect_height = i32::abs(rect.y1 - rect.y2);
 
-        let w = i32::max(3, rng.roll_dice(1, i32::min(rect_width, 10))-1) + 1;
-        let h = i32::max(3, rng.roll_dice(1, i32::min(rect_height, 10))-1) + 1;
+        let w = i32::max(3, rng.roll_dice(1, i32::min(rect_width, 20))-1) + 1;
+        let h = i32::max(3, rng.roll_dice(1, i32::min(rect_height, 20))-1) + 1;
 
         result.x1 += rng.roll_dice(1, 6)-1;
         result.y1 += rng.roll_dice(1, 6)-1;
@@ -96,7 +95,7 @@ impl BspDungeonBuilder {
         result
     }
 
-    fn is_possible(&self, rect : Rect, map : &Map) -> bool {
+    fn is_possible(&self, rect : Rect, build_data : &BuilderMap, rooms: &[Rect]) -> bool {
         let mut expanded = rect;
         expanded.x1 -= 2;
         expanded.x2 += 2;
@@ -105,15 +104,19 @@ impl BspDungeonBuilder {
 
         let mut can_build = true;
 
+        for r in rooms.iter() {
+            if r.intersect(&rect) { can_build = false; }
+        }
+
         for y in expanded.y1 ..= expanded.y2 {
             for x in expanded.x1 ..= expanded.x2 {
-                if x > map.width-2 { can_build = false; }
-                if y > map.height-2 { can_build = false; }
+                if x > build_data.map.width-2 { can_build = false; }
+                if y > build_data.map.height-2 { can_build = false; }
                 if x < 1 { can_build = false; }
                 if y < 1 { can_build = false; }
                 if can_build {
-                    let idx = map.xy_idx(x, y);
-                    if map.tiles[idx] != TileType::Wall {
+                    let idx = build_data.map.xy_idx(x, y);
+                    if build_data.map.tiles[idx] != TileType::Wall {
                         can_build = false;
                     }
                 }
