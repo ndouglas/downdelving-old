@@ -17,6 +17,8 @@ pub struct Map {
     pub height: i32,
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
+    pub blocked: Vec<bool>,
+    pub tile_content: Vec<Vec<Entity>>,
 }
 
 impl Map {
@@ -61,6 +63,8 @@ impl Map {
             height: 50,
             revealed_tiles: vec![false; 80 * 50],
             visible_tiles: vec![false; 80 * 50],
+            blocked: vec![false; 80 * 50],
+            tile_content: vec![Vec::new(); 80 * 50],
         };
 
         const MAX_ROOMS: i32 = 30;
@@ -108,9 +112,20 @@ impl Map {
             return false;
         }
         let idx = self.xy_idx(x, y);
-        self.tiles[idx as usize] != TileType::Wall
+        !self.blocked[idx]
     }
 
+    pub fn populate_blocked(&mut self) {
+        for (i, tile) in self.tiles.iter_mut().enumerate() {
+            self.blocked[i] = *tile == TileType::Wall;
+        }
+    }
+
+    pub fn clear_content_index(&mut self) {
+        for content in self.tile_content.iter_mut() {
+            content.clear();
+        }
+    }
 }
 
 impl BaseMap for Map {
@@ -137,6 +152,20 @@ impl BaseMap for Map {
         if self.is_exit_valid(x, y + 1) {
             exits.push((idx + w, 1.0))
         };
+
+        // Diagonals
+        if self.is_exit_valid(x - 1, y - 1) {
+            exits.push(((idx - w) - 1, 1.45));
+        }
+        if self.is_exit_valid(x + 1, y - 1) {
+            exits.push(((idx - w) + 1, 1.45));
+        }
+        if self.is_exit_valid(x - 1, y + 1) {
+            exits.push(((idx + w) - 1, 1.45));
+        }
+        if self.is_exit_valid(x + 1, y + 1) {
+            exits.push(((idx + w) + 1, 1.45));
+        }
 
         exits
     }
