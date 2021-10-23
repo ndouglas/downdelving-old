@@ -16,7 +16,8 @@ pub struct VoronoiCellBuilder {
     history: Vec<Map>,
     noise_areas : HashMap<i32, Vec<usize>>,
     n_seeds: usize,
-    distance_algorithm: DistanceAlgorithm
+    distance_algorithm: DistanceAlgorithm,
+    spawn_list: Vec<(usize, String)>
 }
 
 impl MapBuilder for VoronoiCellBuilder {
@@ -36,10 +37,8 @@ impl MapBuilder for VoronoiCellBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs : &mut World) {
-        for area in self.noise_areas.iter() {
-            spawner::spawn_region(ecs, area.1, self.depth);
-        }
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
     }
 
     fn take_snapshot(&mut self) {
@@ -63,10 +62,12 @@ impl VoronoiCellBuilder {
             history: Vec::new(),
             noise_areas : HashMap::new(),
             n_seeds: 64,
-            distance_algorithm: DistanceAlgorithm::Pythagoras
+            distance_algorithm: DistanceAlgorithm::Pythagoras,
+            spawn_list : Vec::new()
         }
     }
 
+    #[allow(dead_code)]
     pub fn pythagoras(new_depth : i32) -> VoronoiCellBuilder {
         VoronoiCellBuilder{
             map : Map::new(new_depth),
@@ -75,10 +76,12 @@ impl VoronoiCellBuilder {
             history: Vec::new(),
             noise_areas : HashMap::new(),
             n_seeds: 64,
-            distance_algorithm: DistanceAlgorithm::Pythagoras
+            distance_algorithm: DistanceAlgorithm::Pythagoras,
+            spawn_list : Vec::new()
         }
     }
 
+    #[allow(dead_code)]
     pub fn manhattan(new_depth : i32) -> VoronoiCellBuilder {
         VoronoiCellBuilder{
             map : Map::new(new_depth),
@@ -87,7 +90,8 @@ impl VoronoiCellBuilder {
             history: Vec::new(),
             noise_areas : HashMap::new(),
             n_seeds: 64,
-            distance_algorithm: DistanceAlgorithm::Manhattan
+            distance_algorithm: DistanceAlgorithm::Manhattan,
+            spawn_list : Vec::new()
         }
     }
 
@@ -180,5 +184,10 @@ impl VoronoiCellBuilder {
 
         // Now we build a noise map for use in spawning entities later
         self.noise_areas = generate_voronoi_spawn_regions(&self.map, &mut rng);
+
+        // Spawn the entities
+        for area in self.noise_areas.iter() {
+            spawner::spawn_region(&self.map, &mut rng, area.1, self.depth, &mut self.spawn_list);
+        }
     }
 }
