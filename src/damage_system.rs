@@ -1,15 +1,13 @@
-use super::{gamelog::GameLog, CombatStats, Name, Player, SufferDamage};
 use specs::prelude::*;
+use super::{CombatStats, SufferDamage, Player, Name, gamelog::GameLog};
 
 pub struct DamageSystem {}
 
 impl<'a> System<'a> for DamageSystem {
-    type SystemData = (
-        WriteStorage<'a, CombatStats>,
-        WriteStorage<'a, SufferDamage>,
-    );
+    type SystemData = ( WriteStorage<'a, CombatStats>,
+                        WriteStorage<'a, SufferDamage> );
 
-    fn run(&mut self, data: Self::SystemData) {
+    fn run(&mut self, data : Self::SystemData) {
         let (mut stats, mut damage) = data;
 
         for (mut stats, damage) in (&mut stats, &damage).join() {
@@ -20,8 +18,8 @@ impl<'a> System<'a> for DamageSystem {
     }
 }
 
-pub fn delete_the_dead(ecs: &mut World) {
-    let mut dead: Vec<Entity> = Vec::new();
+pub fn delete_the_dead(ecs : &mut World) {
+    let mut dead : Vec<Entity> = Vec::new();
     // Using a scope to make the borrow checker happy
     {
         let combat_stats = ecs.read_storage::<CombatStats>();
@@ -40,7 +38,7 @@ pub fn delete_the_dead(ecs: &mut World) {
                         }
                         dead.push(entity)
                     }
-                    Some(_) => rltk::console::log("You are dead"),
+                    Some(_) => rltk::console::log("You are dead")
                 }
             }
         }
