@@ -66,7 +66,9 @@ pub enum RunState {
     MapGeneration,
     ShowCheatMenu,
     ShowVendor { vendor: Entity, mode : VendorMode },
-    TeleportingToOtherLevel { x: i32, y: i32, depth: i32 }
+    TeleportingToOtherLevel { x: i32, y: i32, depth: i32 },
+    ShowRemoveCurse,
+    ShowIdentify
 }
 
 pub struct State {
@@ -134,6 +136,7 @@ impl State {
 }
 
 impl GameState for State {
+    #[allow(clippy::cognitive_complexity)]
     fn tick(&mut self, ctx : &mut Rltk) {
         let mut newrunstate;
         {
@@ -189,6 +192,8 @@ impl GameState for State {
                         RunState::MagicMapReveal{ .. } => newrunstate = RunState::MagicMapReveal{ row: 0 },
                         RunState::TownPortal => newrunstate = RunState::TownPortal,
                         RunState::TeleportingToOtherLevel{ x, y, depth } => newrunstate = RunState::TeleportingToOtherLevel{ x, y, depth },
+                        RunState::ShowRemoveCurse => newrunstate = RunState::ShowRemoveCurse,
+                        RunState::ShowIdentify => newrunstate = RunState::ShowIdentify,
                         _ => newrunstate = RunState::Ticking
                     }
                 }
@@ -267,6 +272,33 @@ impl GameState for State {
                         let item_entity = result.1.unwrap();
                         let mut intent = self.ecs.write_storage::<WantsToRemoveItem>();
                         intent.insert(*self.ecs.fetch::<Entity>(), WantsToRemoveItem{ item: item_entity }).expect("Unable to insert intent");
+                        newrunstate = RunState::Ticking;
+                    }
+                }
+            }
+            RunState::ShowRemoveCurse => {
+                let result = gui::remove_curse_menu(self, ctx);
+                match result.0 {
+                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::ItemMenuResult::NoResponse => {}
+                    gui::ItemMenuResult::Selected => {
+                        let item_entity = result.1.unwrap();
+                        self.ecs.write_storage::<CursedItem>().remove(item_entity);
+                        newrunstate = RunState::Ticking;
+                    }
+                }
+            }
+            RunState::ShowIdentify => {
+                let result = gui::identify_menu(self, ctx);
+                match result.0 {
+                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::ItemMenuResult::NoResponse => {}
+                    gui::ItemMenuResult::Selected => {
+                        let item_entity = result.1.unwrap();
+                        if let Some(name) = self.ecs.read_storage::<Name>().get(item_entity) {
+                            let mut dm = self.ecs.fetch_mut::<MasterDungeonMap>();
+                            dm.identified_items.insert(name.name.clone());
+                        }
                         newrunstate = RunState::Ticking;
                     }
                 }
@@ -529,6 +561,9 @@ fn main() -> rltk::BError {
     gs.ecs.register::<IdentifiedItem>();
     gs.ecs.register::<SpawnParticleBurst>();
     gs.ecs.register::<SpawnParticleLine>();
+    gs.ecs.register::<CursedItem>();
+    gs.ecs.register::<ProvidesRemoveCurse>();
+    gs.ecs.register::<ProvidesIdentification>();
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
     raws::load_raws();

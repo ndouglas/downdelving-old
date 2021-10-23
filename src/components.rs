@@ -188,7 +188,16 @@ pub struct MagicItem {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct CursedItem {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Consumable {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ProvidesRemoveCurse {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ProvidesIdentification {}
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct Ranged {

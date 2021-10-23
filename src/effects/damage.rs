@@ -12,13 +12,13 @@ pub fn inflict_damage(ecs: &mut World, damage: &EffectSpawner, target: Entity) {
             if let EffectType::Damage{amount} = damage.effect_type {
                 pool.hit_points.current -= amount;
                 add_effect(None, EffectType::Bloodstain, Targets::Single{target});
-                add_effect(None, 
-                    EffectType::Particle{ 
+                add_effect(None,
+                    EffectType::Particle{
                         glyph: rltk::to_cp437('‼'),
                         fg : rltk::RGB::named(rltk::ORANGE),
                         bg : rltk::RGB::named(rltk::BLACK),
                         lifespan: 200.0
-                    }, 
+                    },
                     Targets::Single{target}
                 );
 

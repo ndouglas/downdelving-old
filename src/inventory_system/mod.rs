@@ -1,6 +1,6 @@
 use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog, WantsToUseItem,
     WantsToDropItem, Map, AreaOfEffect, Equippable, Equipped, WantsToRemoveItem, EquipmentChanged,
-    IdentifiedItem, Item, ObfuscatedName, MagicItem, MasterDungeonMap };
+    IdentifiedItem, Item, ObfuscatedName, MagicItem, MasterDungeonMap, CursedItem };
 
 mod collection_system;
 pub use collection_system::ItemCollectionSystem;
