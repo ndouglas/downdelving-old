@@ -27,7 +27,6 @@ impl<'a> System<'a> for DamageSystem {
 
         for (entity, mut stats, damage) in (&entities, &mut stats, &damage).join() {
             gold_gain += stats.gold;
-            gold_gain += stats.gold;
             for dmg in damage.amount.iter() {
                 if !stats.god_mode {
                     stats.hit_points.current -= dmg.0;

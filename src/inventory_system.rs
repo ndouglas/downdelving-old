@@ -2,7 +2,8 @@ use specs::prelude::*;
 use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, WantsToUseItem,
     Consumable, ProvidesHealing, WantsToDropItem, InflictsDamage, Map, SufferDamage,
     AreaOfEffect, Confusion, Equippable, Equipped, WantsToRemoveItem, particle_system::ParticleBuilder,
-    ProvidesFood, HungerClock, HungerState, MagicMapper, RunState, Pools, EquipmentChanged};
+    ProvidesFood, HungerClock, HungerState, MagicMapper, RunState, Pools, EquipmentChanged,
+    TownPortal};
 
 pub struct ItemCollectionSystem {}
 
@@ -61,7 +62,8 @@ impl<'a> System<'a> for ItemUseSystem {
                         WriteStorage<'a, HungerClock>,
                         ReadStorage<'a, MagicMapper>,
                         WriteExpect<'a, RunState>,
-                        WriteStorage<'a, EquipmentChanged>
+                        WriteStorage<'a, EquipmentChanged>,
+                        ReadStorage<'a, TownPortal>
                       );
 
     #[allow(clippy::cognitive_complexity)]
@@ -69,7 +71,7 @@ impl<'a> System<'a> for ItemUseSystem {
         let (player_entity, mut gamelog, map, entities, mut wants_use, names,
             consumables, healing, inflict_damage, mut combat_stats, mut suffer_damage,
             aoe, mut confused, equippable, mut equipped, mut backpack, mut particle_builder, positions,
-            provides_food, mut hunger_clocks, magic_mapper, mut runstate, mut dirty) = data;
+            provides_food, mut hunger_clocks, magic_mapper, mut runstate, mut dirty, town_portal) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
             dirty.insert(entity, EquipmentChanged{}).expect("Unable to insert");
@@ -157,6 +159,18 @@ impl<'a> System<'a> for ItemUseSystem {
                     used_item = true;
                     gamelog.entries.push("The map is revealed to you!".to_string());
                     *runstate = RunState::MagicMapReveal{ row : 0};
+                }
+            }
+
+            // If its a town portal...
+            if let Some(_townportal) = town_portal.get(useitem.item) {
+                if map.depth == 1 {
+                    gamelog.entries.push("You are already in town, so the scroll does nothing.".to_string());
+                    used_item = false;
+                } else {
+                    used_item = true;
+                    gamelog.entries.push("You are telported back to town!".to_string());
+                    *runstate = RunState::TownPortal;
                 }
             }
 
@@ -312,3 +326,4 @@ impl<'a> System<'a> for ItemRemoveSystem {
         wants_remove.clear();
     }
 }
+

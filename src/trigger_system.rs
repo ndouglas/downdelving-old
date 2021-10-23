@@ -1,6 +1,7 @@
 use specs::prelude::*;
 use super::{EntityMoved, Position, EntryTrigger, Hidden, Map, Name, gamelog::GameLog,
-    InflictsDamage, particle_system::ParticleBuilder, SufferDamage, SingleActivation};
+    InflictsDamage, particle_system::ParticleBuilder, SufferDamage, SingleActivation,
+    TeleportTo, ApplyTeleport};
 
 pub struct TriggerSystem {}
 
@@ -17,12 +18,16 @@ impl<'a> System<'a> for TriggerSystem {
                         ReadStorage<'a, InflictsDamage>,
                         WriteExpect<'a, ParticleBuilder>,
                         WriteStorage<'a, SufferDamage>,
-                        ReadStorage<'a, SingleActivation>);
+                        ReadStorage<'a, SingleActivation>,
+                        ReadStorage<'a, TeleportTo>,
+                        WriteStorage<'a, ApplyTeleport>,
+                        ReadExpect<'a, Entity>);
 
     fn run(&mut self, data : Self::SystemData) {
         let (map, mut entity_moved, position, entry_trigger, mut hidden,
             names, entities, mut log, inflicts_damage, mut particle_builder,
-            mut inflict_damage, single_activation) = data;
+            mut inflict_damage, single_activation, teleporters,
+            mut apply_teleport, player_entity) = data;
 
         // Iterate the entities that moved and their final position
         let mut remove_entities : Vec<Entity> = Vec::new();
@@ -39,16 +44,27 @@ impl<'a> System<'a> for TriggerSystem {
                             if let Some(name) = name {
                                 log.entries.push(format!("{} triggers!", &name.name));
                             }
-            
+
                             hidden.remove(entity_id); // The trap is no longer hidden
-            
+
                             // If the trap is damage inflicting, do it
                             let damage = inflicts_damage.get(entity_id);
                             if let Some(damage) = damage {
                                 particle_builder.request(pos.x, pos.y, rltk::RGB::named(rltk::ORANGE), rltk::RGB::named(rltk::BLACK), rltk::to_cp437('‼'), 200.0);
                                 SufferDamage::new_damage(&mut inflict_damage, entity, damage.damage, false);
                             }
-            
+
+                            // If its a teleporter, then do that
+                            if let Some(teleport) = teleporters.get(entity_id) {
+                                if (teleport.player_only && entity == *player_entity) || !teleport.player_only {
+                                    apply_teleport.insert(entity, ApplyTeleport{
+                                        dest_x : teleport.x,
+                                        dest_y : teleport.y,
+                                        dest_depth : teleport.depth
+                                    }).expect("Unable to insert");
+                                }
+                            }
+
                             // If it is single activation, it needs to be removed
                             let sa = single_activation.get(entity_id);
                             if let Some(_sa) = sa {
