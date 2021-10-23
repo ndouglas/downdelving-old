@@ -197,7 +197,7 @@
             "power" : 4
         },
         "vision_range" : 4,
-        "ai" : "bystander"
+        "ai" : "vendor"
     },
 
     {
@@ -216,7 +216,7 @@
             "power" : 4
         },
         "vision_range" : 4,
-        "ai" : "bystander"
+        "ai" : "vendor"
     },
 
     {
@@ -235,7 +235,8 @@
             "power" : 4
         },
         "vision_range" : 4,
-        "ai" : "bystander"
+        "ai" : "bystander",
+        "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?" ]
     },
 
     {
@@ -273,7 +274,8 @@
             "power" : 4
         },
         "vision_range" : 4,
-        "ai" : "bystander"
+        "ai" : "bystander",
+        "quips" : [ "Great to see a new face here!", "I hear there's going to be a good sermon on tea", "Want some cake?" ]
     },
 
     {
@@ -292,7 +294,7 @@
             "power" : 4
         },
         "vision_range" : 4,
-        "ai" : "bystander"
+        "ai" : "vendor"
     },
 
     {
@@ -311,7 +313,7 @@
             "power" : 4
         },
         "vision_range" : 4,
-        "ai" : "bystander"
+        "ai" : "vendor"
     },
 
     {
@@ -330,7 +332,7 @@
             "power" : 4
         },
         "vision_range" : 4,
-        "ai" : "bystander"
+        "ai" : "vendor"
     },
 
     {
@@ -349,7 +351,8 @@
             "power" : 4
         },
         "vision_range" : 4,
-        "ai" : "bystander"
+        "ai" : "bystander",
+        "quips" : [ "Hello, dear", "Off saving the world again?", "Be careful in the dungeon!", "Your father would be so proud, were he here." ]
     },
 
     {
@@ -368,7 +371,88 @@
             "power" : 4
         },
         "vision_range" : 4,
-        "ai" : "bystander"
+        "ai" : "bystander",
+        "quips" : [ "Why are you in my house?" ]
+    },
+
+    {
+        "name" : "Dock Worker",
+        "renderable": {
+            "glyph" : "☺",
+            "fg" : "#999999",
+            "bg" : "#000000",
+            "order" : 1
+        },
+        "blocks_tile" : true,
+        "stats" : {
+            "max_hp" : 16,
+            "hp" : 16,
+            "defense" : 1,
+            "power" : 4
+        },
+        "vision_range" : 4,
+        "ai" : "bystander",
+        "quips" : [ "Lovely day, eh?", "Nice weather", "Hello" ]
+    },
+
+    {
+        "name" : "Fisher",
+        "renderable": {
+            "glyph" : "☺",
+            "fg" : "#999999",
+            "bg" : "#000000",
+            "order" : 1
+        },
+        "blocks_tile" : true,
+        "stats" : {
+            "max_hp" : 16,
+            "hp" : 16,
+            "defense" : 1,
+            "power" : 4
+        },
+        "vision_range" : 4,
+        "ai" : "bystander",
+        "quips" : [ "They're biting today!", "I caught something, but it wasn't a fish!", "Looks like rain" ]
+    },
+
+    {
+        "name" : "Wannabe Pirate",
+        "renderable": {
+            "glyph" : "☺",
+            "fg" : "#aa9999",
+            "bg" : "#000000",
+            "order" : 1
+        },
+        "blocks_tile" : true,
+        "stats" : {
+            "max_hp" : 16,
+            "hp" : 16,
+            "defense" : 1,
+            "power" : 4
+        },
+        "vision_range" : 4,
+        "ai" : "bystander",
+        "quips" : [ "Arrr", "Grog!", "Booze!" ]
+    },
+
+    {
+        "name" : "Drunk",
+        "renderable": {
+            "glyph" : "☺",
+            "fg" : "#aa9999",
+            "bg" : "#000000",
+            "order" : 1
+        },
+        "blocks_tile" : true,
+        "stats" : {
+            "max_hp" : 16,
+            "hp" : 16,
+            "defense" : 1,
+            "power" : 4
+        },
+        "vision_range" : 4,
+        "ai" : "bystander",
+        "quips" : [ "Hic", "Need... more... booze!", "Spare a copper?" ]
     },
 
     {
