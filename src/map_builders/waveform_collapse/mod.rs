@@ -1,6 +1,7 @@
 use super::{MapBuilder, Map, TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER,
     generate_voronoi_spawn_regions, remove_unreachable_areas_returning_most_distant};
 use rltk::RandomNumberGenerator;
+use specs::prelude::*;
 use std::collections::HashMap;
 mod common;
 use common::*;
@@ -87,6 +88,7 @@ impl WaveformCollapseBuilder {
         let prebuilder = &mut self.derive_from.as_mut().unwrap();
         prebuilder.build_map();
         self.map = prebuilder.get_map();
+        self.history = prebuilder.get_snapshot_history();
         for t in self.map.tiles.iter_mut() {
             if *t == TileType::DownStairs { *t = TileType::Floor; }
         }

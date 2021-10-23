@@ -3,6 +3,7 @@ use super::{MapBuilder, Map,
     remove_unreachable_areas_returning_most_distant, generate_voronoi_spawn_regions,
     Symmetry, paint};
 use rltk::RandomNumberGenerator;
+use specs::prelude::*;
 use std::collections::HashMap;
 
 #[derive(PartialEq, Copy, Clone)]
