@@ -17,7 +17,7 @@ pub fn clear_log() {
 pub fn print_log(console: &mut Box<dyn Console>, pos: Point) {
     let mut y = pos.y;
     let mut x = pos.x;
-    LOG.lock().unwrap().iter().rev().take(6).for_each(|log| {
+    LOG.lock().unwrap().iter().rev().take(6).rev().for_each(|log| {
         log.iter().for_each(|frag| {
             console.print_color(
                 x,
