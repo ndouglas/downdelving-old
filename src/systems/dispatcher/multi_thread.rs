@@ -30,11 +30,11 @@ macro_rules! construct_dispatcher {
 }
 
 pub struct MultiThreadedDispatcher {
-    pub dispatcher: specs::Dispatcher<'static, 'static>
+    pub dispatcher: specs::Dispatcher<'static, 'static>,
 }
 
 impl<'a> UnifiedDispatcher for MultiThreadedDispatcher {
-    fn run_now(&mut self, ecs : *mut World) {
+    fn run_now(&mut self, ecs: *mut World) {
         unsafe {
             self.dispatcher.dispatch(&mut *ecs);
             crate::effects::run_effects_queue(&mut *ecs);

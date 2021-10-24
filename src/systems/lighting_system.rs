@@ -1,17 +1,19 @@
-use specs::prelude::*;
-use crate::{Viewshed, Position, Map, LightSource};
+use crate::{LightSource, Map, Position, Viewshed};
 use rltk::RGB;
+use specs::prelude::*;
 
 pub struct LightingSystem {}
 
 impl<'a> System<'a> for LightingSystem {
     #[allow(clippy::type_complexity)]
-    type SystemData = ( WriteExpect<'a, Map>,
-                        ReadStorage<'a, Viewshed>,
-                        ReadStorage<'a, Position>,
-                        ReadStorage<'a, LightSource>);
+    type SystemData = (
+        WriteExpect<'a, Map>,
+        ReadStorage<'a, Viewshed>,
+        ReadStorage<'a, Position>,
+        ReadStorage<'a, LightSource>,
+    );
 
-    fn run(&mut self, data : Self::SystemData) {
+    fn run(&mut self, data: Self::SystemData) {
         let (mut map, viewshed, positions, lighting) = data;
 
         if map.outdoors {

@@ -1,18 +1,18 @@
+use crate::{effects::*, HungerClock, HungerState, MyTurn};
 use specs::prelude::*;
-use crate::{HungerClock, HungerState, MyTurn, effects::*};
 
 pub struct HungerSystem {}
 
 impl<'a> System<'a> for HungerSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = (
-                        Entities<'a>,
-                        WriteStorage<'a, HungerClock>,
-                        ReadExpect<'a, Entity>, // The player
-                        ReadStorage<'a, MyTurn>
-                      );
+        Entities<'a>,
+        WriteStorage<'a, HungerClock>,
+        ReadExpect<'a, Entity>, // The player
+        ReadStorage<'a, MyTurn>,
+    );
 
-    fn run(&mut self, data : Self::SystemData) {
+    fn run(&mut self, data: Self::SystemData) {
         let (entities, mut hunger_clock, player_entity, turns) = data;
 
         for (entity, mut clock, _myturn) in (&entities, &mut hunger_clock, &turns).join() {
@@ -59,8 +59,8 @@ impl<'a> System<'a> for HungerSystem {
                         }
                         add_effect(
                             None,
-                            EffectType::Damage{ amount: 1},
-                            Targets::Single{ target: entity }
+                            EffectType::Damage { amount: 1 },
+                            Targets::Single { target: entity },
                         );
                     }
                 }

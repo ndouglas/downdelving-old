@@ -27,11 +27,11 @@ macro_rules! construct_dispatcher {
 }
 
 pub struct SingleThreadedDispatcher<'a> {
-    pub systems : Vec<Box<dyn RunNow<'a>>>
+    pub systems: Vec<Box<dyn RunNow<'a>>>,
 }
 
 impl<'a> UnifiedDispatcher for SingleThreadedDispatcher<'a> {
-    fn run_now(&mut self, ecs : *mut World) {
+    fn run_now(&mut self, ecs: *mut World) {
         unsafe {
             for sys in self.systems.iter_mut() {
                 sys.run_now(&*ecs);
