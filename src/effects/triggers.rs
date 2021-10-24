@@ -22,11 +22,26 @@ pub fn item_trigger(creator : Option<Entity>, item: Entity, targets : &Targets, 
     // If it was a consumable, then it gets deleted
     if did_something {
         if let Some(c) = ecs.read_storage::<Consumable>().get(item) {
-            if c.max_charges == 0 {
+            rltk::console::log(format!("{}", c.max_charges));
+            if c.max_charges < 2 {
                 ecs.entities().delete(item).expect("Delete Failed");
             }
         }
     }
+}
+
+pub fn spell_trigger(creator : Option<Entity>, spell: Entity, targets : &Targets, ecs: &mut World) {
+    if let Some(template) = ecs.read_storage::<SpellTemplate>().get(spell) {
+        let mut pools = ecs.write_storage::<Pools>();
+        if let Some(caster) = creator {
+            if let Some(pool) = pools.get_mut(caster) {
+                if template.mana_cost <= pool.mana.current {
+                    pool.mana.current -= template.mana_cost;
+                }
+            }
+        }
+    }
+    event_trigger(creator, spell, targets, ecs);
 }
 
 pub fn trigger(creator : Option<Entity>, trigger: Entity, targets : &Targets, ecs: &mut World) {
@@ -42,6 +57,7 @@ pub fn trigger(creator : Option<Entity>, trigger: Entity, targets : &Targets, ec
     }
 }
 
+#[allow(clippy::cognitive_complexity)]
 fn event_trigger(creator : Option<Entity>, entity: Entity, targets : &Targets, ecs: &mut World) -> bool {
     let mut did_something = false;
     let mut gamelog = ecs.fetch_mut::<GameLog>();
@@ -62,7 +78,7 @@ fn event_trigger(creator : Option<Entity>, entity: Entity, targets : &Targets, e
 
     // Line particle spawn
     if let Some(part) = ecs.read_storage::<SpawnParticleLine>().get(entity) {
-        if let Some(start_pos) = targeting::find_item_position(ecs, entity) {
+        if let Some(start_pos) = targeting::find_item_position(ecs, entity, creator) {            
             match targets {
                 Targets::Tile{tile_idx} => spawn_line_particles(ecs, start_pos, *tile_idx, part),
                 Targets::Tiles{tiles} => tiles.iter().for_each(|tile_idx| spawn_line_particles(ecs, start_pos, *tile_idx, part)),
@@ -131,6 +147,12 @@ fn event_trigger(creator : Option<Entity>, entity: Entity, targets : &Targets, e
         did_something = true;
     }
 
+    // Mana
+    if let Some(mana) = ecs.read_storage::<ProvidesMana>().get(entity) {
+        add_effect(creator, EffectType::Mana{amount: mana.mana_amount}, targets.clone());
+        did_something = true;
+    }
+
     // Damage
     if let Some(damage) = ecs.read_storage::<InflictsDamage>().get(entity) {
         add_effect(creator, EffectType::Damage{ amount: damage.damage }, targets.clone());
@@ -171,6 +193,34 @@ fn event_trigger(creator : Option<Entity>, entity: Entity, targets : &Targets, e
             },
             targets.clone()
         );
+        did_something = true;
+    }
+
+    // Learn spells
+    if let Some(spell) = ecs.read_storage::<TeachesSpell>().get(entity) {
+        if let Some(known) = ecs.write_storage::<KnownSpells>().get_mut(creator.unwrap()) {
+            if let Some(spell_entity) = crate::raws::find_spell_entity(ecs, &spell.spell) {
+                if let Some(spell_info) = ecs.read_storage::<SpellTemplate>().get(spell_entity) {
+                    let mut already_known = false;
+                    known.spells.iter().for_each(|s| if s.display_name == spell.spell { already_known = true });
+                    if !already_known {
+                        known.spells.push(KnownSpell{ display_name: spell.spell.clone(), mana_cost : spell_info.mana_cost });
+                    }
+                }
+            }
+        }
+        did_something = true;
+    }
+
+    // Slow
+    if let Some(slow) = ecs.read_storage::<Slow>().get(entity) {
+        add_effect(creator, EffectType::Slow{ initiative_penalty : slow.initiative_penalty }, targets.clone());
+        did_something = true;
+    }
+
+    // Damage Over Time
+    if let Some(damage) = ecs.read_storage::<DamageOverTime>().get(entity) {
+        add_effect(creator, EffectType::DamageOverTime{ damage : damage.damage }, targets.clone());
         did_something = true;
     }
 
