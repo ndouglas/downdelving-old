@@ -679,6 +679,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<AlwaysTargetsSelf>();
     gs.ecs.register::<Target>();
     gs.ecs.register::<WantsToShoot>();
+    gs.ecs.register::<Bleeds>();
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
     raws::load_raws();

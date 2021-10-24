@@ -24,6 +24,7 @@ pub struct Mob {
     pub vendor: Option<Vec<String>>,
     pub abilities: Option<Vec<MobAbility>>,
     pub on_death: Option<Vec<MobAbility>>,
+    pub bleeds: Option<MobBleeds>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -59,4 +60,10 @@ pub struct MobAbility {
     pub chance: f32,
     pub range: f32,
     pub min_range: f32,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct MobBleeds {
+    pub bleeds: Option<bool>,
+    pub color: Option<String>,
 }

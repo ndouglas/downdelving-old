@@ -1,6 +1,6 @@
 use super::*;
 use crate::components::{
-    Attributes, Confusion, DamageOverTime, Duration, EquipmentChanged, Name, Player, Pools,
+    Attributes, Bleeds, Confusion, DamageOverTime, Duration, EquipmentChanged, Name, Player, Pools,
     SerializeMe, Slow, StatusEffect,
 };
 use crate::map::Map;
@@ -9,6 +9,7 @@ use specs::saveload::{MarkedBuilder, SimpleMarker};
 
 pub fn inflict_damage(ecs: &mut World, damage: &EffectSpawner, target: Entity) {
     let mut pools = ecs.write_storage::<Pools>();
+    let bleeds = ecs.read_storage::<Bleeds>();
     let player_entity = ecs.fetch::<Entity>();
     if let Some(pool) = pools.get_mut(target) {
         if !pool.god_mode {
@@ -19,7 +20,17 @@ pub fn inflict_damage(ecs: &mut World, damage: &EffectSpawner, target: Entity) {
             }
             if let EffectType::Damage { amount } = damage.effect_type {
                 pool.hit_points.current -= amount;
-                add_effect(None, EffectType::Bloodstain, Targets::Single { target });
+                if let Some(bleeder) = bleeds.get(target) {
+                  if bleeder.bleeds {
+                    add_effect(
+                        None,
+                        EffectType::Bloodstain {
+                            color: bleeder.color,
+                        },
+                        Targets::Single { target },
+                    );
+                  }
+                }
                 add_effect(
                     None,
                     EffectType::Particle {
@@ -51,9 +62,14 @@ pub fn inflict_damage(ecs: &mut World, damage: &EffectSpawner, target: Entity) {
     }
 }
 
-pub fn bloodstain(ecs: &mut World, tile_idx: i32) {
-    let mut map = ecs.fetch_mut::<Map>();
-    map.bloodstains.insert(tile_idx as usize);
+pub fn bloodstain(ecs: &mut World, tile_idx: i32, effect: &EffectSpawner) {
+    if let EffectType::Bloodstain {
+        color,
+    } = &effect.effect_type
+    {
+        let mut map = ecs.fetch_mut::<Map>();
+        map.bloodstains.insert(tile_idx as usize, *color);
+    }
 }
 
 pub fn death(ecs: &mut World, effect: &EffectSpawner, target: Entity) {

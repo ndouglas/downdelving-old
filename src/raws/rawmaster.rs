@@ -844,6 +844,18 @@ pub fn spawn_named_mob(
             });
         }
 
+        if let Some(bleeds) = &mob_template.bleeds {
+          eb = eb.with(Bleeds {
+            bleeds: bleeds.bleeds.unwrap_or(false),
+            color: rltk::RGB::from_hex(bleeds.color.as_ref().unwrap_or(&"#C00000".to_string())).expect("Bad color"),
+          })
+        } else {
+          eb = eb.with(Bleeds {
+            bleeds: true,
+            color: rltk::RGB::from_f32(0.9, 0.0, 0.0),
+          })
+        }
+
         if let Some(faction) = &mob_template.faction {
             eb = eb.with(Faction {
                 name: faction.clone(),
@@ -892,7 +904,7 @@ pub fn spawn_named_mob(
 
         let new_mob = eb.build();
 
-        // Are they wielding anyting?
+        // Are they wielding anything?
         if let Some(wielding) = &mob_template.equipped {
             for tag in wielding.iter() {
                 spawn_named_entity(raws, ecs, tag, SpawnType::Equipped { by: new_mob });

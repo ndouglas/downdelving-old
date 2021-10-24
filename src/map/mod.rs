@@ -1,7 +1,7 @@
 use rltk::{Algorithm2D, BaseMap, Point};
 use serde::{Deserialize, Serialize};
 use specs::prelude::*;
-use std::collections::HashSet;
+use std::collections::{ HashSet, HashMap };
 mod tiletype;
 pub use tiletype::{tile_cost, tile_opaque, tile_walkable, TileType};
 mod themes;
@@ -18,7 +18,7 @@ pub struct Map {
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
     pub depth: i32,
-    pub bloodstains: HashSet<usize>,
+    pub bloodstains: HashMap<usize, rltk::RGB>,
     pub view_blocked: HashSet<usize>,
     pub name: String,
     pub outdoors: bool,
@@ -82,7 +82,7 @@ impl Map {
             revealed_tiles: vec![false; map_tile_count],
             visible_tiles: vec![false; map_tile_count],
             depth: new_depth,
-            bloodstains: HashSet::new(),
+            bloodstains: HashMap::new(),
             view_blocked: HashSet::new(),
             name: name.to_string(),
             outdoors: true,

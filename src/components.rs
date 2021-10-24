@@ -452,6 +452,12 @@ pub struct SpawnParticleBurst {
     pub lifetime_ms: f32,
 }
 
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct Bleeds {
+    pub bleeds: bool,
+    pub color: RGB,
+}
+
 #[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
 pub enum HungerState {
     WellFed,

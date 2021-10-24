@@ -1922,7 +1922,11 @@
         "equipped" : [ "Hand Crossbow", "Scimitar", "Buckler", "Drow Chain", "Drow Leggings", "Drow Boots" ],
         "faction" : "DarkElf",
         "gold" : "3d6",
-        "level" : 6
+        "level" : 6,
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#C00020"
+        }
     },
 
     {
@@ -1940,7 +1944,11 @@
         "equipped" : [ "Scimitar +1", "Buckler", "Drow Chain", "Drow Leggings", "Drow Boots" ],
         "faction" : "DarkElfA",
         "gold" : "3d6",
-        "level" : 6
+        "level" : 6,
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#C00020"
+        }
     },
 
     {
@@ -1958,7 +1966,11 @@
         "equipped" : [ "Scimitar +2", "Buckler +1", "Drow Chain", "Drow Leggings", "Drow Boots" ],
         "faction" : "DarkElfA",
         "gold" : "3d6",
-        "level" : 7
+        "level" : 7,
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#C00020"
+        }
     },
 
     {
@@ -1974,7 +1986,11 @@
         "movement" : "static",
         "attributes" : {},
         "faction" : "DarkElfA",
-        "gold" : "1d8"
+        "gold" : "1d8",
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#F4C430"
+        }
     },
 
     {
@@ -1992,7 +2008,11 @@
         "equipped" : [ "Hand Crossbow +1", "Dagger", "Buckler", "Drow Chain", "Drow Leggings", "Drow Boots" ],
         "faction" : "DarkElfB",
         "gold" : "3d6",
-        "level" : 6
+        "level" : 6,
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#C00020"
+        }
     },
 
     {
@@ -2009,7 +2029,11 @@
         "attributes" : {},
         "faction" : "Cave Goblins",
         "gold" : "1d6",
-        "equipped" : [ "Shortbow", "Leather Armor", "Leather Boots" ]
+        "equipped" : [ "Shortbow", "Leather Armor", "Leather Boots" ],
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#F4C430"
+        }
     },
 
     {
@@ -2027,7 +2051,11 @@
         "equipped" : [ "Hand Crossbow", "Scimitar", "Buckler", "Drow Chain", "Drow Leggings", "Drow Boots" ],
         "faction" : "DarkElfC",
         "gold" : "3d6",
-        "level" : 7
+        "level" : 7,
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#C00020"
+        }
     },
 
     {
@@ -2048,7 +2076,11 @@
         "level" : 8,
         "abilities" : [
             { "spell" : "Web", "chance" : 0.2, "range" : 6.0, "min_range" : 3.0 }
-        ]
+        ],
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#C00020"
+        }
     },
 
     {
@@ -2089,7 +2121,11 @@
         "movement" : "static",
         "attributes" : {},
         "faction" : "Cave Goblins",
-        "gold" : "1d8"
+        "gold" : "1d8",
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#F4C430"
+        }
     },
 
     {
@@ -2107,7 +2143,11 @@
         "faction" : "Cave Goblins",
         "gold" : "3d8",
         "equipped" : [ "Battleaxe", "Tower Shield", "Leather Armor", "Leather Boots" ],
-        "level" : 2
+        "level" : 2,
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#F4C430"
+        }
     },
 
     {
@@ -2123,7 +2163,11 @@
         "movement" : "static",
         "attributes" : {},
         "faction" : "Cave Goblins",
-        "gold" : "1d6"
+        "gold" : "1d6",
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#F4C430"
+        }
     },
 
     {
@@ -2140,7 +2184,11 @@
         "attributes" : {},
         "faction" : "Cave Goblins",
         "gold" : "1d6",
-        "equipped" : [ "Shortbow", "Leather Armor", "Leather Boots" ]
+        "equipped" : [ "Shortbow", "Leather Armor", "Leather Boots" ],
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#F4C430"
+        }
     },
 
     {
@@ -2156,7 +2204,11 @@
         "movement" : "static",
         "attributes" : {},
         "faction" : "Cave Goblins",
-        "gold" : "1d4"
+        "gold" : "1d4",
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#F4C430"
+        }
     },
 
     {
@@ -2234,6 +2286,10 @@
         "light" : {
             "range" : 4,
             "color" : "#550000"
+        },
+        "bleeds" : {
+          "bleeds": true,
+          "color": "#D3D3D3"
         }
     },
 
@@ -2375,7 +2431,10 @@
         ],
         "on_death" : [
             { "spell" : "Explode", "chance" : 1.0, "range" : 0.0, "min_range" : 0.0 }
-        ]
+        ],
+        "bleeds" : {
+          "bleeds": false
+        }
     },
 
     {
@@ -2397,7 +2456,10 @@
         ],
         "on_death" : [
             { "spell" : "ConfusionCloud", "chance" : 1.0, "range" : 0.0, "min_range" : 0.0 }
-        ]
+        ],
+        "bleeds" : {
+          "bleeds": false
+        }
     },
 
     {
@@ -2419,7 +2481,10 @@
         ],
         "on_death" : [
             { "spell" : "PoisonCloud", "chance" : 1.0, "range" : 0.0, "min_range" : 0.0 }
-        ]
+        ],
+        "bleeds" : {
+          "bleeds": false
+        }
     },
 
     {
@@ -2437,7 +2502,10 @@
         "faction" : "Fungi",
         "gold" : "2d8",
         "level" : 4,
-        "loot_table" : "Animal"
+        "loot_table" : "Animal",
+        "bleeds" : {
+          "bleeds": false
+        }
     },
 
     {
@@ -2454,7 +2522,10 @@
         "attributes" : {},
         "faction" : "Fungi",
         "gold" : "2d8",
-        "level" : 5
+        "level" : 5,
+        "bleeds" : {
+          "bleeds": false
+        }
     },
 
     {
@@ -2475,7 +2546,10 @@
                 { "name" : "bite", "hit_bonus" : 0, "damage" : "1d4" }
             ]
         },
-        "faction" : "Fungi"
+        "faction" : "Fungi",
+        "bleeds" : {
+          "bleeds": false
+        }
     }
 ],
 
