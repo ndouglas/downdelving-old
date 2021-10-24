@@ -3,6 +3,8 @@ use rltk::RGB;
 
 pub fn tile_glyph(idx: usize, map : &Map) -> (rltk::FontCharType, RGB, RGB) {
     let (glyph, mut fg, mut bg) = match map.depth {
+        9 => get_mushroom_glyph(idx, map),
+        8 => get_mushroom_glyph(idx, map),
         7 => {
             let x = idx as i32 % map.width;
             if x > map.width-16 {
@@ -52,7 +54,7 @@ fn get_forest_glyph(idx:usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
         TileType::Gravel => { glyph = rltk::to_cp437(';'); fg = RGB::from_f32(0.5, 0.5, 0.5); }
         TileType::DownStairs => { glyph = rltk::to_cp437('>'); fg = RGB::from_f32(0., 1.0, 1.0); }
         TileType::UpStairs => { glyph = rltk::to_cp437('<'); fg = RGB::from_f32(0., 1.0, 1.0); }
-        _ => { glyph = rltk::to_cp437('"'); fg = RGB::from_f32(1.0, 0.0, 1.0); }
+        _ => { glyph = rltk::to_cp437('"'); fg = RGB::from_f32(0.0, 0.5, 0.0); }
     }
 
     (glyph, fg, bg)
