@@ -1,7 +1,7 @@
 ---
-name: Task
-about: A task to complete.
-title: "<Insert summary of task>"
+name: Issue
+about: A issue to complete
+title: "<Insert summary of issue>"
 labels:
   - ':rock: Unrefined'
 assignees:
