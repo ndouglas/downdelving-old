@@ -2,7 +2,7 @@ use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use std::cmp::{max, min};
 use super::{Position, Player, Viewshed, State, Map, RunState, Attributes, WantsToMelee, Item,
-    gamelog::GameLog, WantsToPickupItem, TileType, HungerClock, HungerState,
+    WantsToPickupItem, TileType, HungerClock, HungerState,
     EntityMoved, Door, BlocksTile, BlocksVisibility, Renderable, Pools, Faction,
     raws::Reaction, Vendor, VendorMode, WantsToCastSpell, Target, Equipped, Weapon,
     WantsToShoot, Name};
@@ -55,8 +55,6 @@ fn fire_on_target(ecs: &mut World) -> RunState {
     let targets = ecs.write_storage::<Target>();
     let entities = ecs.entities();
     let mut current_target : Option<Entity> = None;
-    let mut log = ecs.fetch_mut::<GameLog>();
-
 
     for (e,_t) in (&entities, &targets).join() {
         current_target = Some(e);
@@ -67,14 +65,18 @@ fn fire_on_target(ecs: &mut World) -> RunState {
         let mut shoot_store = ecs.write_storage::<WantsToShoot>();
         let names = ecs.read_storage::<Name>();
         if let Some(name) = names.get(target) {
-            log.entries.push(format!("You fire at {}", name.name));
+            crate::gamelog::Logger::new()
+                .append("You fire at")
+                .color(rltk::CYAN)
+                .append(&name.name)
+                .log();
         }
         shoot_store.insert(*player_entity, WantsToShoot{ target }).expect("Insert Fail");
 
-        RunState::Ticking
+        return RunState::Ticking;
     } else {
-        log.entries.push("You don't have a target selected!".to_string());
-        RunState::AwaitingInput
+        crate::gamelog::Logger::new().append("You don't have a target selected!").log();
+        return RunState::AwaitingInput;
     }
 
 }
@@ -223,8 +225,7 @@ pub fn try_next_level(ecs: &mut World) -> bool {
     if map.tiles[player_idx] == TileType::DownStairs {
         true
     } else {
-        let mut gamelog = ecs.fetch_mut::<GameLog>();
-        gamelog.entries.push("There is no way down from here.".to_string());
+        crate::gamelog::Logger::new().append("There is no way down from here.").log();
         false
     }
 }
@@ -236,8 +237,7 @@ pub fn try_previous_level(ecs: &mut World) -> bool {
     if map.tiles[player_idx] == TileType::UpStairs {
         true
     } else {
-        let mut gamelog = ecs.fetch_mut::<GameLog>();
-        gamelog.entries.push("There is no way up from here.".to_string());
+        crate::gamelog::Logger::new().append("There is no way up from here.").log();
         false
     }
 }
@@ -248,7 +248,6 @@ fn get_item(ecs: &mut World) {
     let entities = ecs.entities();
     let items = ecs.read_storage::<Item>();
     let positions = ecs.read_storage::<Position>();
-    let mut gamelog = ecs.fetch_mut::<GameLog>();
 
     let mut target_item : Option<Entity> = None;
     for (item_entity, _item, position) in (&entities, &items, &positions).join() {
@@ -258,7 +257,7 @@ fn get_item(ecs: &mut World) {
     }
 
     match target_item {
-        None => gamelog.entries.push("There is nothing here to pick up.".to_string()),
+        None => crate::gamelog::Logger::new().append("There is nothing here to pick up.").log(),
         Some(item) => {
             let mut pickup = ecs.write_storage::<WantsToPickupItem>();
             pickup.insert(*player_entity, WantsToPickupItem{ collected_by: *player_entity, item }).expect("Unable to insert want to pickup");
@@ -372,8 +371,7 @@ fn use_spell_hotkey(gs: &mut State, key: i32) -> RunState {
                 return RunState::Ticking;
             }
         } else {
-            let mut gamelog = gs.ecs.fetch_mut::<GameLog>();
-            gamelog.entries.push("You don't have enough mana to cast that!".to_string());
+            crate::gamelog::Logger::new().append("You don't have enough mana to cast that!").log();
         }
     }
 

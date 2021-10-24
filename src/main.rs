@@ -188,6 +188,9 @@ impl GameState for State {
             }
             RunState::AwaitingInput => {
                 newrunstate = player_input(self, ctx);
+                if newrunstate != RunState::AwaitingInput {
+                    crate::gamelog::record_event("Turn", 1);
+                }
             }
             RunState::Ticking => {
                 let mut should_change_target = false;
@@ -463,8 +466,7 @@ impl State {
         self.generate_world_map(current_depth + offset, offset);
 
         // Notify the player
-        let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
-        gamelog.entries.push("You change level.".to_string());
+        gamelog::Logger::new().append("You change level.").log();
     }
 
     fn game_over_cleanup(&mut self) {
@@ -501,6 +503,15 @@ impl State {
         } else {
             map::thaw_level_entities(&mut self.ecs);
         }
+
+        gamelog::clear_log();
+        gamelog::Logger::new()
+            .append("Welcome to")
+            .color(rltk::CYAN)
+            .append("Rusty Roguelike")
+            .log();
+
+        gamelog::clear_events();
     }
 }
 
@@ -610,7 +621,6 @@ fn main() -> rltk::BError {
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);
     gs.ecs.insert(player_entity);
     gs.ecs.insert(RunState::MapGeneration{} );
-    gs.ecs.insert(gamelog::GameLog{ entries : vec!["Welcome to Rusty Roguelike".to_string()] });
     gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(rex_assets::RexAssets::new());
 

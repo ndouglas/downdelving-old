@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use super::{Attributes, Skills, WantsToMelee, Name, gamelog::GameLog,
+use super::{Attributes, Skills, WantsToMelee, Name,
     HungerClock, HungerState, Pools, skill_bonus,
     Skill, Equipped, Weapon, EquipmentSlot, WeaponAttribute, Wearable, NaturalAttackDefense,
     effects::*};
@@ -9,7 +9,6 @@ pub struct MeleeCombatSystem {}
 impl<'a> System<'a> for MeleeCombatSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = ( Entities<'a>,
-                        WriteExpect<'a, GameLog>,
                         WriteStorage<'a, WantsToMelee>,
                         ReadStorage<'a, Name>,
                         ReadStorage<'a, Attributes>,
@@ -24,7 +23,7 @@ impl<'a> System<'a> for MeleeCombatSystem {
                       );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (entities, mut log, mut wants_melee, names, attributes, skills,
+        let (entities, mut wants_melee, names, attributes, skills,
             hunger_clock, pools, mut rng, equipped_items, weapon, wearables, natural) = data;
 
         for (entity, wants_melee, name, attacker_attributes, attacker_skills, attacker_pools) in (&entities, &wants_melee, &names, &attributes, &skills, &pools).join() {
@@ -118,7 +117,14 @@ impl<'a> System<'a> for MeleeCombatSystem {
                         EffectType::Damage{ amount: damage },
                         Targets::Single{ target: wants_melee.target }
                     );
-                    log.entries.push(format!("{} hits {}, for {} hp.", &name.name, &target_name.name, damage));
+                    crate::gamelog::Logger::new()
+                        .npc_name(&name.name)
+                        .append("hits")
+                        .npc_name(&target_name.name)
+                        .append("for")
+                        .damage(damage)
+                        .append("hp.")
+                        .log();
 
                     // Proc effects
                     if let Some(chance) = &weapon_info.proc_chance {
@@ -141,7 +147,16 @@ impl<'a> System<'a> for MeleeCombatSystem {
 
                 } else  if natural_roll == 1 {
                     // Natural 1 miss
-                    log.entries.push(format!("{} considers attacking {}, but misjudges the timing.", name.name, target_name.name));
+                    crate::gamelog::Logger::new()
+                        .color(rltk::CYAN)
+                        .append(&name.name)
+                        .color(rltk::WHITE)
+                        .append("considers attacking")
+                        .color(rltk::CYAN)
+                        .append(&target_name.name)
+                        .color(rltk::WHITE)
+                        .append("but misjudges the timing!")
+                        .log();
                     add_effect(
                         None,
                         EffectType::Particle{ glyph: rltk::to_cp437('‼'), fg: rltk::RGB::named(rltk::BLUE), bg : rltk::RGB::named(rltk::BLACK), lifespan: 200.0 },
@@ -149,7 +164,16 @@ impl<'a> System<'a> for MeleeCombatSystem {
                     );
                 } else {
                     // Miss
-                    log.entries.push(format!("{} attacks {}, but can't connect.", name.name, target_name.name));
+                    crate::gamelog::Logger::new()
+                        .color(rltk::CYAN)
+                        .append(&name.name)
+                        .color(rltk::WHITE)
+                        .append("attacks")
+                        .color(rltk::CYAN)
+                        .append(&target_name.name)
+                        .color(rltk::WHITE)
+                        .append("but can't connect.")
+                        .log();
                     add_effect(
                         None,
                         EffectType::Particle{ glyph: rltk::to_cp437('‼'), fg: rltk::RGB::named(rltk::CYAN), bg : rltk::RGB::named(rltk::BLACK), lifespan: 200.0 },
