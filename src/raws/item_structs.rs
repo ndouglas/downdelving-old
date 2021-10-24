@@ -12,7 +12,8 @@ pub struct Item {
     pub weight_lbs : Option<f32>,
     pub base_value : Option<f32>,
     pub vendor_category : Option<String>,
-    pub magic : Option<MagicItem>
+    pub magic : Option<MagicItem>,
+    pub attributes : Option<ItemAttributeBonus>
 }
 
 #[derive(Deserialize, Debug)]
@@ -25,7 +26,8 @@ pub struct Renderable {
 
 #[derive(Deserialize, Debug)]
 pub struct Consumable {
-    pub effects : HashMap<String, String>
+    pub effects : HashMap<String, String>,
+    pub charges : Option<i32>
 }
 
 #[derive(Deserialize, Debug)]
@@ -39,7 +41,7 @@ pub struct Weapon {
 #[derive(Deserialize, Debug)]
 pub struct Wearable {
     pub armor_class: f32,
-    pub slot : String
+    pub slot : String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -47,4 +49,12 @@ pub struct MagicItem {
     pub class: String,
     pub naming: String,
     pub cursed: Option<bool>
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ItemAttributeBonus {
+    pub might : Option<i32>,
+    pub fitness : Option<i32>,
+    pub quickness : Option<i32>,
+    pub intelligence : Option<i32>
 }

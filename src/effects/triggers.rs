@@ -4,12 +4,28 @@ use crate::gamelog::GameLog;
 use crate::RunState;
 
 pub fn item_trigger(creator : Option<Entity>, item: Entity, targets : &Targets, ecs: &mut World) {
+    // Check charges
+    if let Some(c) = ecs.write_storage::<Consumable>().get_mut(item) {
+        if c.charges < 1 {
+            // Cancel
+            let mut gamelog = ecs.fetch_mut::<GameLog>();
+            gamelog.entries.push(format!("{} is out of charges!", ecs.read_storage::<Name>().get(item).unwrap().name));
+            return;
+        } else {
+            c.charges -= 1;
+        }
+    }
+
     // Use the item via the generic system
     let did_something = event_trigger(creator, item, targets, ecs);
 
     // If it was a consumable, then it gets deleted
-    if did_something && ecs.read_storage::<Consumable>().get(item).is_some() {
-        ecs.entities().delete(item).expect("Delete Failed");
+    if did_something {
+        if let Some(c) = ecs.read_storage::<Consumable>().get(item) {
+            if c.max_charges == 0 {
+                ecs.entities().delete(item).expect("Delete Failed");
+            }
+        }
     }
 }
 
@@ -122,9 +138,11 @@ fn event_trigger(creator : Option<Entity>, entity: Entity, targets : &Targets, e
     }
 
     // Confusion
-    if let Some(confusion) = ecs.read_storage::<Confusion>().get(entity) {
-        add_effect(creator, EffectType::Confusion{ turns : confusion.turns }, targets.clone());
-        did_something = true;
+    if let Some(_confusion) = ecs.read_storage::<Confusion>().get(entity) {
+        if let Some(duration) = ecs.read_storage::<Duration>().get(entity) {
+            add_effect(creator, EffectType::Confusion{ turns : duration.turns }, targets.clone());
+            did_something = true;
+        }
     }
 
     // Teleport
@@ -137,6 +155,20 @@ fn event_trigger(creator : Option<Entity>, entity: Entity, targets : &Targets, e
                 depth: teleport.depth, 
                 player_only: teleport.player_only 
             }, 
+            targets.clone()
+        );
+        did_something = true;
+    }
+
+    // Attribute Modifiers
+    if let Some(attr) = ecs.read_storage::<AttributeBonus>().get(entity) {
+        add_effect(
+            creator,
+            EffectType::AttributeEffect{
+                bonus : attr.clone(),
+                duration : 10,
+                name : ecs.read_storage::<Name>().get(entity).unwrap().name.clone()
+            },
             targets.clone()
         );
         did_something = true;

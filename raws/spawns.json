@@ -2,6 +2,7 @@
 "spawn_table" : [
     { "name" : "Goblin", "weight" : 10, "min_depth" : 3, "max_depth" : 4 },
     { "name" : "Orc", "weight" : 1, "min_depth" : 4, "max_depth" : 100 },
+    { "name" : "Strength Potion", "weight" : 2, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Health Potion", "weight" : 7, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Fireball Scroll", "weight" : 2, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
     { "name" : "Confusion Scroll", "weight" : 2, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
@@ -9,6 +10,8 @@
     { "name" : "Town Portal Scroll", "weight" : 4, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Remove Curse Scroll", "weight" : 4, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Identify Scroll", "weight" : 4, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Rod of Fireballs", "weight" : 1, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Gauntlets of Ogre Power", "weight" : 1, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Dagger", "weight" : 3, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Shield", "weight" : 3, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Longsword", "weight" : 2, "min_depth" : 3, "max_depth" : 100 },
@@ -60,7 +63,7 @@
 "faction_table" : [
     { "name" : "Player", "responses": { }},
     { "name" : "Mindless", "responses": { "Default" : "attack" } },
-    { "name" : "Townsfolk", "responses" : { "Default" : "flee", "Player" : "ignore", "Townsfolk" : "ignore" } },
+    { "name" : "Townsfolk", "responses" : { "Default" : "flee", "Player" : "ignore", "Townsfolk" : "ignore", "Dwarven Remnant" : "ignore" } },
     { "name" : "Bandits", "responses" : { "Default" : "attack", "Bandits" : "ignore" } },
     { "name" : "Cave Goblins", "responses" : { "Default" : "attack", "Cave Goblins" : "ignore" } },
     { "name" : "Carnivores", "responses" : { "Default" : "attack", "Carnivores" : "ignore" } },
@@ -86,6 +89,24 @@
         "base_value" : 50.0,
         "vendor_category" : "alchemy",
         "magic" : { "class" : "common", "naming" : "potion" }
+    },
+
+    {
+        "name" : "Strength Potion",
+        "renderable": {
+            "glyph" : "!",
+            "fg" : "#FF00FF",
+            "bg" : "#000000",
+            "order" : 2
+        },
+        "consumable" : {
+            "effects" : { "particle" : "!;#FF0000;200.0" }
+        },
+        "weight_lbs" : 0.5,
+        "base_value" : 50.0,
+        "vendor_category" : "alchemy",
+        "magic" : { "class" : "common", "naming" : "potion" },
+        "attributes" : { "might" : 5 }
     },
 
     {
@@ -728,7 +749,7 @@
             "order" : 2
         },
         "wearable" : {
-            "slot" : "Head",
+            "slot" : "Torso",
             "armor_class" : 1.0
         },
         "weight_lbs" : 5.0,
@@ -753,6 +774,49 @@
         "base_value" : 5.0,
         "initiative_penalty" : 0.25,
         "vendor_category" : "clothes"
+    },
+
+    {
+        "name" : "Gauntlets of Ogre Power",
+        "renderable": {
+            "glyph" : "[",
+            "fg" : "#00FF00",
+            "bg" : "#000000",
+            "order" : 2
+        },
+        "wearable" : {
+            "slot" : "Hands",
+            "armor_class" : 0.1
+        },
+        "weight_lbs" : 1.0,
+        "base_value" : 300.0,
+        "initiative_penalty" : 0.0,
+        "vendor_category" : "armor",
+        "magic" : { "class" : "common", "naming" : "Unidentified Gauntlets" },
+        "attributes" : { "might" : 5 }
+    },
+
+    {
+        "name" : "Rod of Fireballs",
+        "renderable": {
+            "glyph" : "/",
+            "fg" : "#FFAAAA",
+            "bg" : "#000000",
+            "order" : 2
+        },
+        "consumable" : {
+            "effects" : { 
+                "ranged" : "6",
+                "damage" : "20",
+                "area_of_effect" : "3",
+                "particle" : "▓;#FFA500;200.0"
+            },
+            "charges" : 5
+        },
+        "weight_lbs" : 0.5,
+        "base_value" : 500.0,
+        "vendor_category" : "alchemy",
+        "magic" : { "class" : "common", "naming" : "Unidentified Rod" }
     }
 ],
 

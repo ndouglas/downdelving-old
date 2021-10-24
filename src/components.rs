@@ -188,10 +188,21 @@ pub struct MagicItem {
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct AttributeBonus {
+    pub might : Option<i32>,
+    pub fitness : Option<i32>,
+    pub quickness : Option<i32>,
+    pub intelligence : Option<i32>
+}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct CursedItem {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Consumable {}
+pub struct Consumable {
+    pub max_charges : i32,
+    pub charges : i32
+}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct ProvidesRemoveCurse {}
@@ -214,9 +225,17 @@ pub struct AreaOfEffect {
     pub radius : i32
 }
 
-#[derive(Component, Debug, ConvertSaveload, Clone)]
-pub struct Confusion {
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Confusion {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Duration {
     pub turns : i32
+}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct StatusEffect {
+    pub target : Entity
 }
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]

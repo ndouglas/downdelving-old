@@ -9,6 +9,7 @@ mod particles;
 mod triggers;
 mod hunger;
 mod movement;
+use crate::components::AttributeBonus;
 
 lazy_static! {
     pub static ref EFFECT_QUEUE : Mutex<VecDeque<EffectSpawner>> = Mutex::new(VecDeque::new());
@@ -25,7 +26,8 @@ pub enum EffectType {
     Healing { amount : i32 },
     Confusion { turns : i32 },
     TriggerFire { trigger: Entity },
-    TeleportTo { x:i32, y:i32, depth: i32, player_only : bool }
+    TeleportTo { x:i32, y:i32, depth: i32, player_only : bool },
+    AttributeEffect { bonus : AttributeBonus, name : String, duration : i32 }
 }
 
 #[derive(Clone, Debug)]
@@ -87,6 +89,7 @@ fn tile_effect_hits_entities(effect: &EffectType) -> bool {
         EffectType::Healing{..} => true,
         EffectType::Confusion{..} => true,
         EffectType::TeleportTo{..} => true,
+        EffectType::AttributeEffect{..} => true,
         _ => false
     }
 }
@@ -96,7 +99,7 @@ fn affect_tile(ecs: &mut World, effect: &EffectSpawner, tile_idx : i32) {
         let content = crate::spatial::get_tile_content_clone(tile_idx as usize);
         content.iter().for_each(|entity| affect_entity(ecs, effect, *entity));
     }
-
+    
     match &effect.effect_type {
         EffectType::Bloodstain => damage::bloodstain(ecs, tile_idx),
         EffectType::Particle{..} => particles::particle_to_tile(ecs, tile_idx, &effect),
@@ -114,6 +117,7 @@ fn affect_entity(ecs: &mut World, effect: &EffectSpawner, target: Entity) {
         EffectType::Healing{..} => damage::heal_damage(ecs, effect, target),
         EffectType::Confusion{..} => damage::add_confusion(ecs, effect, target),
         EffectType::TeleportTo{..} => movement::apply_teleport(ecs, effect, target),
+        EffectType::AttributeEffect{..} => damage::attribute_effect(ecs, effect, target),
         _ => {}
     }
 }

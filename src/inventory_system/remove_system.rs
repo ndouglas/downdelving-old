@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use super::{InBackpack, Equipped, WantsToRemoveItem, CursedItem, Name};
+use super::{InBackpack, Equipped, WantsToRemoveItem, CursedItem, Name, EquipmentChanged};
 
 pub struct ItemRemoveSystem {}
 
@@ -12,11 +12,12 @@ impl<'a> System<'a> for ItemRemoveSystem {
                         WriteStorage<'a, InBackpack>,
                         ReadStorage<'a, CursedItem>,
                         WriteExpect<'a, crate::gamelog::GameLog>,
-                        ReadStorage<'a, Name>
+                        ReadStorage<'a, Name>,
+                        WriteStorage<'a, EquipmentChanged>
                       );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (entities, mut wants_remove, mut equipped, mut backpack, cursed, mut gamelog, names) = data;
+        let (entities, mut wants_remove, mut equipped, mut backpack, cursed, mut gamelog, names, mut dirty) = data;
 
         for (entity, to_remove) in (&entities, &wants_remove).join() {
             if cursed.get(to_remove.item).is_some() {
@@ -25,6 +26,7 @@ impl<'a> System<'a> for ItemRemoveSystem {
                 equipped.remove(to_remove.item);
                 backpack.insert(to_remove.item, InBackpack{ owner: entity }).expect("Unable to insert backpack");
             }
+            dirty.insert(entity, EquipmentChanged{}).expect("Unable to insert");
         }
 
         wants_remove.clear();
