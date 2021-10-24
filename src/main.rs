@@ -243,7 +243,18 @@ impl GameState for State {
                         let mut player_pools = pools.get_mut(*player).unwrap();
                         crate::effects::add_effect(
                             None,
-                            crate::effects::EffectType::AddExperienceLevel {},
+                            crate::effects::EffectType::AddExperienceLevel,
+                            crate::effects::Targets::Single { target: *player },
+                        );
+                        newrunstate = RunState::Ticking;
+                    }
+                    gui::CheatMenuResult::Eat => {
+                        let player = self.ecs.fetch::<Entity>();
+                        let mut pools = self.ecs.write_storage::<Pools>();
+                        let mut player_pools = pools.get_mut(*player).unwrap();
+                        crate::effects::add_effect(
+                            None,
+                            crate::effects::EffectType::WellFed,
                             crate::effects::Targets::Single { target: *player },
                         );
                         newrunstate = RunState::Ticking;
