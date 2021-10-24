@@ -1,7 +1,7 @@
 use specs::prelude::*;
 use super::*;
 use crate::components::{Pools, Player, Attributes, Confusion, SerializeMe, Duration, StatusEffect, 
-    Name, EquipmentChanged, Slow, DamageOverTime, Skills};
+    Name, EquipmentChanged, Slow, DamageOverTime, Skills, OnDeath, Position};
 use crate::map::Map;
 use crate::gamesystem::{player_hp_at_level, mana_at_level};
 use crate::gamelog::GameLog;
@@ -51,7 +51,7 @@ pub fn death(ecs: &mut World, effect: &EffectSpawner, target : Entity) {
 
     if let Some(pos) = entity_position(ecs, target) {
         crate::spatial::remove_entity(target, pos as usize);
-    }
+    }    
 
     if let Some(source) = effect.creator {
         if ecs.read_storage::<Player>().get(source).is_some() {
