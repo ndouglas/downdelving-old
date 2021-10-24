@@ -73,10 +73,10 @@ fn fire_on_target(ecs: &mut World) -> RunState {
         }
         shoot_store.insert(*player_entity, WantsToShoot{ target }).expect("Insert Fail");
 
-        RunState::Ticking
+        return RunState::Ticking;
     } else {
         crate::gamelog::Logger::new().append("You don't have a target selected!").log();
-        RunState::AwaitingInput
+        return RunState::AwaitingInput;
     }
 
 }
@@ -124,8 +124,8 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
     let mut blocks_movement = ecs.write_storage::<BlocksTile>();
     let mut renderables = ecs.write_storage::<Renderable>();
     let factions = ecs.read_storage::<Faction>();
-    let mut result = RunState::AwaitingInput;
     let vendors = ecs.read_storage::<Vendor>();
+    let mut result = RunState::AwaitingInput;
 
     let mut swap_entities : Vec<(Entity, i32, i32)> = Vec::new();
 
@@ -137,6 +137,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
             if let Some(_vendor) = vendors.get(potential_target) {
                 return Some(RunState::ShowVendor{ vendor: potential_target, mode : VendorMode::Sell });
             }
+
             let mut hostile = true;
             if combat_stats.get(potential_target).is_some() {
                 if let Some(faction) = factions.get(potential_target) {
@@ -183,12 +184,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
         });
 
         if !crate::spatial::is_blocked(destination_idx) {
-            let old_idx = map.xy_idx(pos.x, pos.y);
             pos.x = min(map.width-1 , max(0, pos.x + delta_x));
             pos.y = min(map.height-1, max(0, pos.y + delta_y));
-            let new_idx = map.xy_idx(pos.x, pos.y);
             entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
-            crate::spatial::move_entity(entity, old_idx, new_idx);
 
             viewshed.dirty = true;
             let mut ppos = ecs.write_resource::<Point>();
@@ -206,12 +204,8 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
     for m in swap_entities.iter() {
         let their_pos = positions.get_mut(m.0);
         if let Some(their_pos) = their_pos {
-            let old_idx = map.xy_idx(their_pos.x, their_pos.y);
             their_pos.x = m.1;
             their_pos.y = m.2;
-            let new_idx = map.xy_idx(their_pos.x, their_pos.y);
-            crate::spatial::move_entity(m.0, old_idx, new_idx);
-            result = RunState::Ticking;
         }
     }
 
@@ -308,8 +302,7 @@ fn skip_turn(ecs: &mut World) -> RunState {
         let mut health_components = ecs.write_storage::<Pools>();
         let pools = health_components.get_mut(*player_entity).unwrap();
         pools.hit_points.current = i32::min(pools.hit_points.current + 1, pools.hit_points.max);
-        let mut rng = ecs.fetch_mut::<rltk::RandomNumberGenerator>();
-        if rng.roll_dice(1,6)==1 {
+        if crate::rng::roll_dice(1,6)==1 {
             pools.mana.current = i32::min(pools.mana.current + 1, pools.mana.max);
         }
     }

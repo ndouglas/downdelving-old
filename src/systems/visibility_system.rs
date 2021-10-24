@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use super::{Viewshed, Position, Map, Player, Hidden, BlocksVisibility, Name};
+use crate::{Viewshed, Position, Map, Player, Hidden, BlocksVisibility, Name};
 use rltk::{field_of_view, Point};
 
 pub struct VisibilitySystem {}
@@ -12,13 +12,12 @@ impl<'a> System<'a> for VisibilitySystem {
                         ReadStorage<'a, Position>,
                         ReadStorage<'a, Player>,
                         WriteStorage<'a, Hidden>,
-                        WriteExpect<'a, rltk::RandomNumberGenerator>,
                         ReadStorage<'a, Name>,
                         ReadStorage<'a, BlocksVisibility>);
 
     fn run(&mut self, data : Self::SystemData) {
         let (mut map, entities, mut viewshed, pos, player,
-            mut hidden, mut rng, names, blocks_visibility) = data;
+            mut hidden, names, blocks_visibility) = data;
 
         map.view_blocked.clear();
         for (block_pos, _block) in (&pos, &blocks_visibility).join() {
@@ -46,7 +45,7 @@ impl<'a> System<'a> for VisibilitySystem {
                             crate::spatial::for_each_tile_content(idx, |e| {
                                 let maybe_hidden = hidden.get(e);
                                 if let Some(_maybe_hidden) = maybe_hidden {
-                                    if rng.roll_dice(1,24)==1 {
+                                    if crate::rng::roll_dice(1,24)==1 {
                                         let name = names.get(e);
                                         if let Some(name) = name {
                                             crate::gamelog::Logger::new()

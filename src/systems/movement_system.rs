@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use super::{Map, Position, BlocksTile, ApplyMove, ApplyTeleport, OtherLevelPosition, EntityMoved,
+use crate::{Map, Position, BlocksTile, ApplyMove, ApplyTeleport, OtherLevelPosition, EntityMoved,
     Viewshed, RunState};
 
 pub struct MovementSystem {}
