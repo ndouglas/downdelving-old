@@ -306,8 +306,8 @@ impl TownBuilder {
         buildings: &[(i32, i32, i32, i32)],
         building_index: &[(usize, i32, BuildingTag)],
     ) {
-        for (i, building) in buildings.iter().enumerate() {
-            let build_type = &building_index[i].2;
+        for (i, _size, build_type) in building_index.iter() {
+            let building = &buildings[*i];
             match build_type {
                 BuildingTag::Pub => self.build_pub(&building, build_data),
                 BuildingTag::Temple => self.build_temple(&building, build_data),
