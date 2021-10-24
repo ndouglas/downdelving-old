@@ -3,3 +3,4 @@ Cargo.lock
 **/*.rs.bk
 /target/
 /target
+.DS_Store
