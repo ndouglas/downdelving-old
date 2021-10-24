@@ -442,7 +442,7 @@ impl TownBuilder {
 
     fn spawn_dockers(&mut self, build_data: &mut BuilderMap) {
         for (idx, tt) in build_data.map.tiles.iter().enumerate() {
-            if *tt == TileType::Bridge && crate::rng::roll_dice(1, 6) == 1 {
+            if *tt == TileType::Bridge && crate::rng::roll_dice(1, 12) == 1 {
                 let roll = crate::rng::roll_dice(1, 3);
                 match roll {
                     1 => build_data.spawn_list.push((idx, "Dock Worker".to_string())),
@@ -461,7 +461,7 @@ impl TownBuilder {
         available_building_tiles: &mut HashSet<usize>,
     ) {
         for idx in available_building_tiles.iter() {
-            if crate::rng::roll_dice(1, 10) == 1 {
+            if crate::rng::roll_dice(1, 30) == 1 {
                 let roll = crate::rng::roll_dice(1, 4);
                 match roll {
                     1 => build_data.spawn_list.push((*idx, "Peasant".to_string())),
