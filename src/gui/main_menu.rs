@@ -17,7 +17,7 @@ pub fn main_menu(gs : &mut State, ctx : &mut Rltk) -> MainMenuResult {
     draw_batch.draw_double_box(Rect::with_size(24, 18, 31, 10), ColorPair::new(RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK)));
 
     draw_batch.print_color_centered(20, "Rust Roguelike Tutorial", ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)));
-    draw_batch.print_color_centered(21, "by Herbert Wolverson", ColorPair::new(RGB::named(rltk::CYAN), RGB::named(rltk::BLACK)));
+    draw_batch.print_color_centered(21, "by Nathan Douglas", ColorPair::new(RGB::named(rltk::CYAN), RGB::named(rltk::BLACK)));
     draw_batch.print_color_centered(22, "Use Up/Down Arrows and Enter", ColorPair::new(RGB::named(rltk::GRAY), RGB::named(rltk::BLACK)));
 
     let mut y = 24;

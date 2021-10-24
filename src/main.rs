@@ -449,8 +449,8 @@ impl State {
         gamelog::clear_log();
         gamelog::Logger::new()
             .append("Welcome to")
-            .color(rltk::CYAN)
-            .append("Rusty Roguelike")
+            .color(rltk::DARK_RED)
+            .append("Downdelving")
             .log();
 
         gamelog::clear_events();
@@ -461,12 +461,12 @@ fn main() -> rltk::BError {
     use rltk::RltkBuilder;
     let mut context = RltkBuilder::simple(80, 60)
         .unwrap()
-        .with_title("Roguelike Tutorial")
+        .with_title("Downdelving")
         .with_font("vga8x16.png", 8, 16)
         .with_sparse_console(80, 30, "vga8x16.png")
         .with_vsync(false)
         .build()?;
-    context.with_post_scanlines(true);
+    context.with_post_scanlines(false);
     let mut gs = State {
         ecs: World::new(),
         mapgen_next_state : Some(RunState::MainMenu{ menu_selection: gui::MainMenuSelection::NewGame }),
