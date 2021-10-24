@@ -97,7 +97,6 @@ impl RawMaster {
     fn build_base_magic_item(&self, nmw : &NewMagicItem) -> super::Item {
         let base_item_index = self.item_index[&nmw.name];
         let mut base_item_copy = self.raws.items[base_item_index].clone();
-        base_item_copy.vendor_category = None;
 
         if nmw.bonus == -1 {
             base_item_copy.name = format!("{} -1", nmw.name);
@@ -152,7 +151,7 @@ impl RawMaster {
                 weight : 10 - i32::abs(nmw.bonus),
                 min_depth : 1 + i32::abs((nmw.bonus-1)*3),
                 max_depth : 100,
-                add_map_depth_to_weight : None,
+                add_map_depth_to_weight : None
             });
         }
     }
@@ -465,7 +464,8 @@ pub fn spawn_named_item(raws: &RawMaster, ecs : &mut World, key : &str, pos : Sp
         if let Some(weapon) = &item_template.weapon {
             eb = eb.with(Equippable{ slot: EquipmentSlot::Melee });
             let (n_dice, die_type, bonus) = parse_dice_string(&weapon.base_damage);
-            let mut wpn = MeleeWeapon{
+            let mut wpn = Weapon{
+                range : if weapon.range == "melee" { None } else { Some(weapon.range.parse::<i32>().expect("Not a number")) },
                 attribute : WeaponAttribute::Might,
                 damage_n_dice : n_dice,
                 damage_die_type : die_type,

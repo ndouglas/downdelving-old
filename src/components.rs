@@ -1,6 +1,6 @@
 use specs::prelude::*;
 use specs_derive::*;
-use rltk::{RGB};
+use rltk::{RGB, Point};
 use serde::{Serialize, Deserialize};
 use specs::saveload::{Marker, ConvertSaveload};
 use specs::error::NoError;
@@ -36,6 +36,8 @@ pub struct Renderable {
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Player {}
 
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Target {}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct KnownSpell {
@@ -204,6 +206,11 @@ pub struct WantsToMelee {
 }
 
 #[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct WantsToShoot {
+    pub target : Entity
+}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct Chasing {
     pub target : Entity
 }
@@ -366,7 +373,8 @@ pub struct Equipped {
 pub enum WeaponAttribute { Might, Quickness }
 
 #[derive(Component, Serialize, Deserialize, Clone)]
-pub struct MeleeWeapon {
+pub struct Weapon {
+    pub range : Option<i32>,
     pub attribute : WeaponAttribute,
     pub damage_n_dice : i32,
     pub damage_die_type : i32,
@@ -397,9 +405,18 @@ pub struct NaturalAttackDefense {
     pub attacks : Vec<NaturalAttack>
 }
 
+#[derive(Serialize, Deserialize, Clone)]
+pub struct ParticleAnimation {
+    pub step_time : f32,
+    pub path : Vec<Point>,
+    pub current_step : usize,
+    pub timer : f32
+}
+
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct ParticleLifetime {
-    pub lifetime_ms : f32
+    pub lifetime_ms : f32,
+    pub animation : Option<ParticleAnimation>
 }
 
 #[derive(Component, Serialize, Deserialize, Clone)]

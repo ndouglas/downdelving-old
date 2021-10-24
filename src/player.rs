@@ -4,7 +4,109 @@ use std::cmp::{max, min};
 use super::{Position, Player, Viewshed, State, Map, RunState, Attributes, WantsToMelee, Item,
     gamelog::GameLog, WantsToPickupItem, TileType, HungerClock, HungerState,
     EntityMoved, Door, BlocksTile, BlocksVisibility, Renderable, Pools, Faction,
-    raws::Reaction, Vendor, VendorMode, WantsToCastSpell};
+    raws::Reaction, Vendor, VendorMode, WantsToCastSpell, Target, Equipped, Weapon,
+    WantsToShoot, Name};
+
+fn get_player_target_list(ecs : &mut World) -> Vec<(f32,Entity)> {
+    let mut possible_targets : Vec<(f32,Entity)> = Vec::new();
+    let viewsheds = ecs.read_storage::<Viewshed>();
+    let player_entity = ecs.fetch::<Entity>();
+    let equipped = ecs.read_storage::<Equipped>();
+    let weapon = ecs.read_storage::<Weapon>();
+    let map = ecs.fetch::<Map>();
+    let positions = ecs.read_storage::<Position>();
+    let factions = ecs.read_storage::<Faction>();
+    for (equipped, weapon) in (&equipped, &weapon).join() {
+        if equipped.owner == *player_entity && weapon.range.is_some() {
+            let range = weapon.range.unwrap();
+
+            if let Some(vs) = viewsheds.get(*player_entity) {
+                let player_pos = positions.get(*player_entity).unwrap();
+                for tile_point in vs.visible_tiles.iter() {
+                    let tile_idx = map.xy_idx(tile_point.x, tile_point.y);
+                    let distance_to_target = rltk::DistanceAlg::Pythagoras.distance2d(*tile_point, rltk::Point::new(player_pos.x, player_pos.y));
+                    if distance_to_target < range as f32 {
+                        crate::spatial::for_each_tile_content(tile_idx, |possible_target| {
+                            if possible_target != *player_entity && factions.get(possible_target).is_some() {
+                                possible_targets.push((distance_to_target, possible_target));
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    possible_targets.sort_by(|a,b| a.0.partial_cmp(&b.0).unwrap());
+    possible_targets
+}
+
+pub fn end_turn_targeting(ecs: &mut World) {
+    let possible_targets = get_player_target_list(ecs);
+    let mut targets = ecs.write_storage::<Target>();
+    targets.clear();
+
+    if !possible_targets.is_empty() {
+        targets.insert(possible_targets[0].1, Target{}).expect("Insert fail");
+    }
+}
+
+fn fire_on_target(ecs: &mut World) -> RunState {
+    let targets = ecs.write_storage::<Target>();
+    let entities = ecs.entities();
+    let mut current_target : Option<Entity> = None;
+    let mut log = ecs.fetch_mut::<GameLog>();
+
+
+    for (e,_t) in (&entities, &targets).join() {
+        current_target = Some(e);
+    }
+
+    if let Some(target) = current_target {
+        let player_entity = ecs.fetch::<Entity>();
+        let mut shoot_store = ecs.write_storage::<WantsToShoot>();
+        let names = ecs.read_storage::<Name>();
+        if let Some(name) = names.get(target) {
+            log.entries.push(format!("You fire at {}", name.name));
+        }
+        shoot_store.insert(*player_entity, WantsToShoot{ target }).expect("Insert Fail");
+
+        RunState::Ticking
+    } else {
+        log.entries.push("You don't have a target selected!".to_string());
+        RunState::AwaitingInput
+    }
+
+}
+
+fn cycle_target(ecs: &mut World) {
+    let possible_targets = get_player_target_list(ecs);
+    let mut targets = ecs.write_storage::<Target>();
+    let entities = ecs.entities();
+    let mut current_target : Option<Entity> = None;
+
+    for (e,_t) in (&entities, &targets).join() {
+        current_target = Some(e);
+    }
+
+    targets.clear();
+    if let Some(current_target) = current_target {
+        if !possible_targets.len() > 1 {
+            let mut index = 0;
+            for (i, target) in possible_targets.iter().enumerate() {
+                if target.1 == current_target {
+                    index = i;
+                }
+            }
+
+            if index > possible_targets.len()-2 {
+                targets.insert(possible_targets[0].1, Target{}).expect("Insert fail");
+            } else {
+                targets.insert(possible_targets[index+1].1, Target{}).expect("Insert fail");
+            }
+        }
+    }
+}
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState {
     let mut positions = ecs.write_storage::<Position>();
@@ -371,6 +473,13 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             VirtualKeyCode::I => return RunState::ShowInventory,
             VirtualKeyCode::D => return RunState::ShowDropItem,
             VirtualKeyCode::R => return RunState::ShowRemoveItem,
+
+            // Ranged
+            VirtualKeyCode::V => {
+                cycle_target(&mut gs.ecs);
+                return RunState::AwaitingInput;
+            }
+            VirtualKeyCode::F => return fire_on_target(&mut gs.ecs),
 
             // Save and Quit
             VirtualKeyCode::Escape => return RunState::SaveGame,
