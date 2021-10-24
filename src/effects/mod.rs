@@ -3,6 +3,7 @@ use specs::prelude::*;
 use std::collections::{HashSet, VecDeque};
 use std::sync::Mutex;
 mod damage;
+mod experience;
 mod targeting;
 pub use targeting::*;
 mod hunger;
@@ -18,6 +19,10 @@ lazy_static! {
 
 #[derive(Debug)]
 pub enum EffectType {
+    AddExperience {
+        amount: i32,
+    },
+    AddExperienceLevel,
     Damage {
         amount: i32,
     },
@@ -169,6 +174,8 @@ fn affect_entity(ecs: &mut World, effect: &mut EffectSpawner, target: Entity) {
     }
     effect.dedupe.insert(target);
     match &effect.effect_type {
+        EffectType::AddExperience { .. } => experience::add_experience(ecs, effect, target),
+        EffectType::AddExperienceLevel => experience::add_experience_level(ecs, effect, target),
         EffectType::Damage { .. } => damage::inflict_damage(ecs, effect, target),
         EffectType::EntityDeath => damage::death(ecs, effect, target),
         EffectType::Bloodstain { .. } => {

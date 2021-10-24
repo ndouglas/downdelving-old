@@ -237,6 +237,17 @@ impl GameState for State {
                         player_pools.god_mode = true;
                         newrunstate = RunState::AwaitingInput;
                     }
+                    gui::CheatMenuResult::LevelUp => {
+                        let player = self.ecs.fetch::<Entity>();
+                        let mut pools = self.ecs.write_storage::<Pools>();
+                        let mut player_pools = pools.get_mut(*player).unwrap();
+                        crate::effects::add_effect(
+                            None,
+                            crate::effects::EffectType::AddExperienceLevel {},
+                            crate::effects::Targets::Single { target: *player },
+                        );
+                        newrunstate = RunState::Ticking;
+                    }
                 }
             }
             RunState::ShowDropItem => {

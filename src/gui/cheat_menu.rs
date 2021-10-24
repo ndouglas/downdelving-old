@@ -10,6 +10,7 @@ pub enum CheatMenuResult {
     Heal,
     Reveal,
     GodMode,
+    LevelUp,
 }
 
 pub fn show_cheat_mode(_gs: &mut State, ctx: &mut Rltk) -> CheatMenuResult {
@@ -54,6 +55,14 @@ pub fn show_cheat_mode(_gs: &mut State, ctx: &mut Rltk) -> CheatMenuResult {
         rltk::to_cp437('G'),
         "God Mode (No Death)",
     );
+    y += 1;
+    menu_option(
+        &mut draw_batch,
+        17,
+        y,
+        rltk::to_cp437('L'),
+        "Level up",
+    );
 
     draw_batch.submit(6000);
 
@@ -64,6 +73,7 @@ pub fn show_cheat_mode(_gs: &mut State, ctx: &mut Rltk) -> CheatMenuResult {
             VirtualKeyCode::H => CheatMenuResult::Heal,
             VirtualKeyCode::R => CheatMenuResult::Reveal,
             VirtualKeyCode::G => CheatMenuResult::GodMode,
+            VirtualKeyCode::L => CheatMenuResult::LevelUp,
             VirtualKeyCode::Escape => CheatMenuResult::Cancel,
             _ => CheatMenuResult::NoResponse,
         },
