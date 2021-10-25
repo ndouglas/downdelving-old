@@ -110,6 +110,7 @@ impl GameState for State {
         ctx.cls();
         systems::particle_system::update_particles(&mut self.ecs, ctx);
 
+        // Draw the game map unless we're in one of a few states.
         match newrunstate {
             RunState::MainMenu { .. } => {}
             RunState::DemoMenu { .. } => {}
