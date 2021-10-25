@@ -18,6 +18,8 @@ mod ranged_target;
 pub use ranged_target::*;
 mod main_menu;
 pub use main_menu::*;
+mod demo_menu;
+pub use demo_menu::*;
 mod game_over_menu;
 pub use game_over_menu::*;
 mod cheat_menu;

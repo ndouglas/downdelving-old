@@ -52,6 +52,9 @@ pub enum RunState {
     MainMenu {
         menu_selection: gui::MainMenuSelection,
     },
+    DemoMenu {
+        menu_selection: gui::DemoMenuSelection,
+    },
     SaveGame,
     NextLevel,
     PreviousLevel,
@@ -109,6 +112,7 @@ impl GameState for State {
 
         match newrunstate {
             RunState::MainMenu { .. } => {}
+            RunState::DemoMenu { .. } => {}
             RunState::GameOver { .. } => {}
             _ => {
                 camera::render_camera(&self.ecs, ctx);
@@ -434,8 +438,26 @@ impl GameState for State {
                             newrunstate = RunState::AwaitingInput;
                             saveload_system::delete_save();
                         }
+                        gui::MainMenuSelection::Demos => newrunstate = RunState::DemoMenu {
+                          menu_selection: gui::DemoMenuSelection::Exit
+                        },
                         gui::MainMenuSelection::Quit => {
                             ::std::process::exit(0);
+                        }
+                    },
+                }
+            }
+            RunState::DemoMenu { .. } => {
+                let result = gui::demo_menu(self, ctx);
+                match result {
+                    gui::DemoMenuResult::NoSelection { selected } => {
+                        newrunstate = RunState::DemoMenu {
+                            menu_selection: selected,
+                        }
+                    }
+                    gui::DemoMenuResult::Selected { selected } => match selected {
+                        gui::DemoMenuSelection::Exit => newrunstate = RunState::MainMenu {
+                          menu_selection: gui::MainMenuSelection::Demos
                         }
                     },
                 }

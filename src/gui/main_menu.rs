@@ -5,6 +5,7 @@ use rltk::prelude::*;
 pub enum MainMenuSelection {
     NewGame,
     LoadGame,
+    Demos,
     Quit,
 }
 
@@ -79,6 +80,21 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
             y += 1;
         }
 
+        if selection == MainMenuSelection::Demos {
+            draw_batch.print_color_centered(
+                y,
+                "Demos",
+                ColorPair::new(RGB::named(rltk::MAGENTA), RGB::named(rltk::BLACK)),
+            );
+        } else {
+            draw_batch.print_color_centered(
+                y,
+                "Demos",
+                ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
+            );
+        }
+        y += 1;
+
         if selection == MainMenuSelection::Quit {
             draw_batch.print_color_centered(
                 y,
@@ -112,7 +128,8 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
                     match selection {
                         MainMenuSelection::NewGame => newselection = MainMenuSelection::Quit,
                         MainMenuSelection::LoadGame => newselection = MainMenuSelection::NewGame,
-                        MainMenuSelection::Quit => newselection = MainMenuSelection::LoadGame,
+                        MainMenuSelection::Demos => newselection = MainMenuSelection::LoadGame,
+                        MainMenuSelection::Quit => newselection = MainMenuSelection::Demos,
                     }
                     if newselection == MainMenuSelection::LoadGame && !save_exists {
                         newselection = MainMenuSelection::NewGame;
@@ -125,11 +142,12 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
                     let mut newselection;
                     match selection {
                         MainMenuSelection::NewGame => newselection = MainMenuSelection::LoadGame,
-                        MainMenuSelection::LoadGame => newselection = MainMenuSelection::Quit,
+                        MainMenuSelection::LoadGame => newselection = MainMenuSelection::Demos,
+                        MainMenuSelection::Demos => newselection = MainMenuSelection::Quit,
                         MainMenuSelection::Quit => newselection = MainMenuSelection::NewGame,
                     }
                     if newselection == MainMenuSelection::LoadGame && !save_exists {
-                        newselection = MainMenuSelection::Quit;
+                        newselection = MainMenuSelection::Demos;
                     }
                     return MainMenuResult::NoSelection {
                         selected: newselection,
