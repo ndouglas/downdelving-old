@@ -140,7 +140,8 @@ pub fn save_game(ecs: &mut World) {
             OnDeath,
             AlwaysTargetsSelf,
             Target,
-            WantsToShoot
+            WantsToShoot,
+            Bleeds
         );
     }
 
@@ -273,7 +274,8 @@ pub fn load_game(ecs: &mut World) {
             OnDeath,
             AlwaysTargetsSelf,
             Target,
-            WantsToShoot
+            WantsToShoot,
+            Bleeds
         );
     }
 
