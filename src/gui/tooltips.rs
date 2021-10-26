@@ -187,5 +187,5 @@ pub fn draw_tooltips(ecs: &World, ctx: &mut Rltk) {
         y += tt.height();
     }
 
-    draw_batch.submit(7000);
+    draw_batch.submit(7000).map_err(|err| println!("{:?}", err)).ok();
 }

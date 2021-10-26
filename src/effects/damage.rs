@@ -1,10 +1,9 @@
 use super::*;
 use crate::components::{
-    Attributes, Bleeds, Confusion, DamageOverTime, Duration, EquipmentChanged, Name, Player, Pools,
+    Bleeds, Confusion, DamageOverTime, Duration, EquipmentChanged, Name, Player, Pools,
     SerializeMe, Slow, StatusEffect,
 };
 use crate::map::Map;
-use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 
 pub fn inflict_damage(ecs: &mut World, damage: &EffectSpawner, target: Entity) {
@@ -73,7 +72,6 @@ pub fn death(ecs: &mut World, effect: &EffectSpawner, target: Entity) {
     let mut gold_gain = 0.0f32;
 
     let mut pools = ecs.write_storage::<Pools>();
-    let mut attributes = ecs.write_storage::<Attributes>();
 
     if let Some(pos) = entity_position(ecs, target) {
         crate::spatial::remove_entity(target, pos as usize);

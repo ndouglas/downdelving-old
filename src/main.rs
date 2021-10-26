@@ -244,8 +244,6 @@ impl GameState for State {
                     }
                     gui::CheatMenuResult::LevelUp => {
                         let player = self.ecs.fetch::<Entity>();
-                        let mut pools = self.ecs.write_storage::<Pools>();
-                        let mut player_pools = pools.get_mut(*player).unwrap();
                         crate::effects::add_effect(
                             None,
                             crate::effects::EffectType::AddExperienceLevel,
@@ -255,8 +253,6 @@ impl GameState for State {
                     }
                     gui::CheatMenuResult::Eat => {
                         let player = self.ecs.fetch::<Entity>();
-                        let mut pools = self.ecs.write_storage::<Pools>();
-                        let mut player_pools = pools.get_mut(*player).unwrap();
                         crate::effects::add_effect(
                             None,
                             crate::effects::EffectType::WellFed,
@@ -545,7 +541,7 @@ impl GameState for State {
         }
         damage_system::delete_the_dead(&mut self.ecs);
 
-        rltk::render_draw_buffer(ctx);
+        rltk::render_draw_buffer(ctx).map_err(|err| println!("{:?}", err)).ok();
         if SHOW_FPS {
             ctx.print(1, 59, &format!("FPS: {}", ctx.fps));
         }

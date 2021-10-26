@@ -109,7 +109,7 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
             );
         }
 
-        draw_batch.submit(6000);
+        draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
 
         match ctx.key {
             None => {

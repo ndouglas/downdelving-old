@@ -84,7 +84,7 @@ fn vendor_sell_menu(
         j += 1;
     }
 
-    draw_batch.submit(6000);
+    draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
 
     match ctx.key {
         None => (VendorResult::NoResponse, None, None, None),
@@ -160,7 +160,7 @@ fn vendor_buy_menu(
         y += 1;
     }
 
-    draw_batch.submit(6000);
+    draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
 
     match ctx.key {
         None => (VendorResult::NoResponse, None, None, None),

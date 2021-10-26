@@ -159,7 +159,7 @@ impl<'a> System<'a> for VisibleAI {
 
 fn evaluate(
     idx: usize,
-    map: &Map,
+    _map: &Map,
     factions: &ReadStorage<Faction>,
     my_faction: &str,
     reactions: &mut Vec<(usize, Reaction, Entity)>,

@@ -61,7 +61,7 @@ pub fn show_cheat_mode(_gs: &mut State, ctx: &mut Rltk) -> CheatMenuResult {
     y += 1;
     menu_option(&mut draw_batch, 17, y, rltk::to_cp437('E'), "Eat");
 
-    draw_batch.submit(6000);
+    draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
 
     match ctx.key {
         None => CheatMenuResult::NoResponse,

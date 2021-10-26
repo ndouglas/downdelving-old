@@ -71,7 +71,7 @@ pub fn ranged_target(
         }
     }
 
-    draw_batch.submit(5000);
+    draw_batch.submit(5000).map_err(|err| println!("{:?}", err)).ok();
 
     (ItemMenuResult::NoResponse, None)
 }

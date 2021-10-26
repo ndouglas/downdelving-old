@@ -49,7 +49,7 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
             );
         }
 
-        draw_batch.submit(6000);
+        draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
 
         match ctx.key {
             None => {
@@ -64,7 +64,7 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                     }
                 }
                 VirtualKeyCode::Up => {
-                    let mut newselection;
+                    let newselection;
                     match selection {
                         DemoMenuSelection::Exit => newselection = DemoMenuSelection::Exit,
                     }
@@ -73,7 +73,7 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                     };
                 }
                 VirtualKeyCode::Down => {
-                    let mut newselection;
+                    let newselection;
                     match selection {
                         DemoMenuSelection::Exit => newselection = DemoMenuSelection::Exit,
                     }

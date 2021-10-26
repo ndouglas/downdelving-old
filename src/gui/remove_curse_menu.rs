@@ -40,6 +40,6 @@ pub fn remove_curse_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Opt
         .for_each(|item| items.push((item.0, get_item_display_name(&gs.ecs, item.0))));
 
     let result = item_result_menu(&mut draw_batch, "Inventory", items.len(), &items, ctx.key);
-    draw_batch.submit(6000);
+    draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
     result
 }

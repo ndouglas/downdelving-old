@@ -1,11 +1,9 @@
 use super::*;
 use crate::components::{Attributes, EquipmentChanged, Pools, Skills};
 use crate::gamesystem::{mana_at_level, player_hp_at_level};
-use specs::prelude::*;
 
 pub fn add_experience(ecs: &mut World, experience_effect: &EffectSpawner, target: Entity) {
     let mut pools = ecs.write_storage::<Pools>();
-    let mut attributes = ecs.write_storage::<Attributes>();
     let mut player_stats = pools.get_mut(target).unwrap();
     if let EffectType::AddExperience { amount } = experience_effect.effect_type {
         player_stats.xp += amount;
@@ -19,7 +17,7 @@ pub fn add_experience(ecs: &mut World, experience_effect: &EffectSpawner, target
     }
 }
 
-pub fn add_experience_level(ecs: &mut World, level_effect: &EffectSpawner, target: Entity) {
+pub fn add_experience_level(ecs: &mut World, _level_effect: &EffectSpawner, target: Entity) {
     let mut pools = ecs.write_storage::<Pools>();
     let mut attributes = ecs.write_storage::<Attributes>();
     let mut player_stats = pools.get_mut(target).unwrap();

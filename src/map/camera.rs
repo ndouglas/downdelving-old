@@ -121,7 +121,7 @@ pub fn render_camera(ecs: &World, ctx: &mut Rltk) {
         }
     }
 
-    draw_batch.submit(0);
+    draw_batch.submit(0).map_err(|err| println!("{:?}", err)).ok();
 }
 
 pub fn render_debug_map(map: &Map, ctx: &mut Rltk) {
