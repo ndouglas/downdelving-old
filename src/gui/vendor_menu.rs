@@ -13,6 +13,8 @@ pub enum VendorResult {
     Buy,
 }
 
+const VENDOR_MENU_WIDTH: i32 = 45;
+
 fn vendor_sell_menu(
     gs: &mut State,
     ctx: &mut Rltk,
@@ -32,11 +34,13 @@ fn vendor_sell_menu(
     let count = inventory.count();
 
     let mut y = (25 - (count / 2)) as i32;
+
     menu_box(
         &mut draw_batch,
         15,
         y,
-        (count + 3) as i32,
+        VENDOR_MENU_WIDTH,
+        (count + 13) as i32,
         "Sell Which Item? (space to switch to buy mode)",
     );
     draw_batch.print_color(
@@ -129,6 +133,7 @@ fn vendor_buy_menu(
         &mut draw_batch,
         15,
         y,
+        VENDOR_MENU_WIDTH,
         (count + 3) as i32,
         "Buy Which Item? (space to switch to sell mode)",
     );
