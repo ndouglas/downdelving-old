@@ -41,11 +41,11 @@ fn vendor_sell_menu(
         y,
         VENDOR_MENU_WIDTH,
         (count + 13) as i32,
-        "Sell Which Item? (space to switch to buy mode)",
+        "Sell Which Item?",
     );
     draw_batch.print_color(
         Point::new(18, y + count as i32 + 1),
-        "ESCAPE to cancel",
+        "[Esc] cancel [Space] buy",
         ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
     );
 
@@ -135,11 +135,11 @@ fn vendor_buy_menu(
         y,
         VENDOR_MENU_WIDTH,
         (count + 3) as i32,
-        "Buy Which Item? (space to switch to sell mode)",
+        "Buy Which Item?",
     );
     draw_batch.print_color(
         Point::new(18, y + count as i32 + 1),
-        "ESCAPE to cancel",
+        "[Esc] cancel [Space] sell",
         ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
     );
 
