@@ -57,21 +57,9 @@ pub fn show_cheat_mode(_gs: &mut State, ctx: &mut Rltk) -> CheatMenuResult {
         "God Mode (No Death)",
     );
     y += 1;
-    menu_option(
-        &mut draw_batch,
-        17,
-        y,
-        rltk::to_cp437('L'),
-        "Level up",
-    );
+    menu_option(&mut draw_batch, 17, y, rltk::to_cp437('L'), "Level up");
     y += 1;
-    menu_option(
-        &mut draw_batch,
-        17,
-        y,
-        rltk::to_cp437('E'),
-        "Eat",
-    );
+    menu_option(&mut draw_batch, 17, y, rltk::to_cp437('E'), "Eat");
 
     draw_batch.submit(6000);
 

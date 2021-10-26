@@ -21,15 +21,15 @@ pub fn inflict_damage(ecs: &mut World, damage: &EffectSpawner, target: Entity) {
             if let EffectType::Damage { amount } = damage.effect_type {
                 pool.hit_points.current -= amount;
                 if let Some(bleeder) = bleeds.get(target) {
-                  if bleeder.bleeds {
-                    add_effect(
-                        None,
-                        EffectType::Bloodstain {
-                            color: bleeder.color,
-                        },
-                        Targets::Single { target },
-                    );
-                  }
+                    if bleeder.bleeds {
+                        add_effect(
+                            None,
+                            EffectType::Bloodstain {
+                                color: bleeder.color,
+                            },
+                            Targets::Single { target },
+                        );
+                    }
                 }
                 add_effect(
                     None,
@@ -63,10 +63,7 @@ pub fn inflict_damage(ecs: &mut World, damage: &EffectSpawner, target: Entity) {
 }
 
 pub fn bloodstain(ecs: &mut World, tile_idx: i32, effect: &EffectSpawner) {
-    if let EffectType::Bloodstain {
-        color,
-    } = &effect.effect_type
-    {
+    if let EffectType::Bloodstain { color } = &effect.effect_type {
         let mut map = ecs.fetch_mut::<Map>();
         map.bloodstains.insert(tile_idx as usize, *color);
     }

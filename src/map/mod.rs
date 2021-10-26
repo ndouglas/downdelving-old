@@ -1,7 +1,7 @@
 use rltk::{Algorithm2D, BaseMap, Point};
 use serde::{Deserialize, Serialize};
 use specs::prelude::*;
-use std::collections::{ HashSet, HashMap };
+use std::collections::{HashMap, HashSet};
 mod tiletype;
 pub use tiletype::{tile_cost, tile_opaque, tile_walkable, TileType};
 mod themes;

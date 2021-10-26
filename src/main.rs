@@ -433,15 +433,22 @@ impl GameState for State {
                         }
                     }
                     gui::MainMenuResult::Selected { selected } => match selected {
-                        gui::MainMenuSelection::NewGame => newrunstate = RunState::PreRun,
+                        gui::MainMenuSelection::NewGame => {
+                            saveload_system::new_game(&mut self.ecs);
+                            self.generate_world_map(1, 0);
+                            newrunstate = RunState::MapGeneration;
+                            self.mapgen_next_state = Some(RunState::PreRun);
+                        }
                         gui::MainMenuSelection::LoadGame => {
                             saveload_system::load_game(&mut self.ecs);
                             newrunstate = RunState::AwaitingInput;
                             saveload_system::delete_save();
                         }
-                        gui::MainMenuSelection::Demos => newrunstate = RunState::DemoMenu {
-                          menu_selection: gui::DemoMenuSelection::Exit
-                        },
+                        gui::MainMenuSelection::Demos => {
+                            newrunstate = RunState::DemoMenu {
+                                menu_selection: gui::DemoMenuSelection::Exit,
+                            }
+                        }
                         gui::MainMenuSelection::Quit => {
                             ::std::process::exit(0);
                         }
@@ -457,8 +464,10 @@ impl GameState for State {
                         }
                     }
                     gui::DemoMenuResult::Selected { selected } => match selected {
-                        gui::DemoMenuSelection::Exit => newrunstate = RunState::MainMenu {
-                          menu_selection: gui::MainMenuSelection::Demos
+                        gui::DemoMenuSelection::Exit => {
+                            newrunstate = RunState::MainMenu {
+                                menu_selection: gui::MainMenuSelection::Demos,
+                            }
                         }
                     },
                 }

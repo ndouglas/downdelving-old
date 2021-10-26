@@ -313,6 +313,31 @@ pub fn load_game(ecs: &mut World) {
         .expect("Unable to delete helper");
 }
 
+pub fn new_game(ecs: &mut World) {
+    {
+        // Delete everything
+        let mut to_delete = Vec::new();
+        for e in ecs.entities().join() {
+            to_delete.push(e);
+        }
+        for del in to_delete.iter() {
+            ecs.delete_entity(*del).expect("Deletion failed");
+        }
+    }
+    {
+        let mut dungeonmaster = ecs.write_resource::<super::map::MasterDungeonMap>();
+        *dungeonmaster = super::map::MasterDungeonMap::new();
+        let mut worldmap = ecs.write_resource::<super::map::Map>();
+        *worldmap = super::map::Map::new(1, 64, 64, "New Map");
+        crate::gamelog::clear_log();
+        let mut ppos = ecs.write_resource::<rltk::Point>();
+        *ppos = rltk::Point::new(0, 0);
+    }
+    let player_entity = super::spawner::player(ecs, 0, 0);
+    let mut player_resource = ecs.write_resource::<Entity>();
+    *player_resource = player_entity;
+}
+
 pub fn delete_save() {
     if Path::new("./savegame.json").exists() {
         std::fs::remove_file("./savegame.json").expect("Unable to delete file");
