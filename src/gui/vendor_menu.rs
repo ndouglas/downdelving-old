@@ -40,7 +40,7 @@ fn vendor_sell_menu(
         15,
         y,
         VENDOR_MENU_WIDTH,
-        (count + 13) as i32,
+        (count + 3) as i32,
         "Sell Which Item?",
     );
     draw_batch.print_color(
