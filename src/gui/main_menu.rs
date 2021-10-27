@@ -20,96 +20,75 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
     let save_exists = crate::saveload_system::does_save_exist();
     let runstate = gs.ecs.fetch::<RunState>();
     let assets = gs.ecs.fetch::<RexAssets>();
+    let black = RGB::named(rltk::BLACK);
+    let wheat_on_black = ColorPair::new(RGB::named(rltk::WHEAT), black);
+    let yellow_on_black = ColorPair::new(RGB::named(rltk::YELLOW), black);
+    let magenta_on_black = ColorPair::new(RGB::named(rltk::MAGENTA), black);
+    let cyan_on_black = ColorPair::new(RGB::named(rltk::CYAN), black);
+    let gray_on_black = ColorPair::new(RGB::named(rltk::GRAY), black);
+    let white_on_black = ColorPair::new(RGB::named(rltk::WHITE), black);
     ctx.render_xp_sprite(&assets.menu, 0, 0);
 
-    draw_batch.draw_double_box(
-        Rect::with_size(24, 18, 31, 10),
-        ColorPair::new(RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK)),
-    );
+    draw_batch.draw_double_box(Rect::with_size(24, 18, 31, 10), wheat_on_black);
 
-    draw_batch.print_color_centered(
-        20,
-        "Downdelving",
-        ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
-    );
-    draw_batch.print_color_centered(
-        21,
-        "by Nathan Douglas",
-        ColorPair::new(RGB::named(rltk::CYAN), RGB::named(rltk::BLACK)),
-    );
-    draw_batch.print_color_centered(
-        22,
-        "Use Up/Down Arrows and Enter",
-        ColorPair::new(RGB::named(rltk::GRAY), RGB::named(rltk::BLACK)),
-    );
+    draw_batch.print_color_centered(20, "Downdelving", yellow_on_black);
+    draw_batch.print_color_centered(21, "by Nathan Douglas", cyan_on_black);
+    draw_batch.print_color_centered(22, "Use Up/Down Arrows and Enter", gray_on_black);
 
     let mut y = 24;
     if let RunState::MainMenu {
         menu_selection: selection,
     } = *runstate
     {
-        if selection == MainMenuSelection::NewGame {
-            draw_batch.print_color_centered(
-                y,
-                "Begin New Game",
-                ColorPair::new(RGB::named(rltk::MAGENTA), RGB::named(rltk::BLACK)),
-            );
-        } else {
-            draw_batch.print_color_centered(
-                y,
-                "Begin New Game",
-                ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
-            );
-        }
+        draw_batch.print_color_centered(
+            y,
+            "Begin New Game",
+            if selection == MainMenuSelection::NewGame {
+                magenta_on_black
+            } else {
+                white_on_black
+            },
+        );
         y += 1;
 
         if save_exists {
-            if selection == MainMenuSelection::LoadGame {
-                draw_batch.print_color_centered(
-                    y,
-                    "Load Game",
-                    ColorPair::new(RGB::named(rltk::MAGENTA), RGB::named(rltk::BLACK)),
-                );
-            } else {
-                draw_batch.print_color_centered(
-                    y,
-                    "Load Game",
-                    ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
-                );
-            }
+            draw_batch.print_color_centered(
+                y,
+                "Load Game",
+                if selection == MainMenuSelection::LoadGame {
+                    magenta_on_black
+                } else {
+                    white_on_black
+                },
+            );
             y += 1;
         }
 
-        if selection == MainMenuSelection::Demos {
-            draw_batch.print_color_centered(
-                y,
-                "Demos",
-                ColorPair::new(RGB::named(rltk::MAGENTA), RGB::named(rltk::BLACK)),
-            );
-        } else {
-            draw_batch.print_color_centered(
-                y,
-                "Demos",
-                ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
-            );
-        }
+        draw_batch.print_color_centered(
+            y,
+            "Demos",
+            if selection == MainMenuSelection::Demos {
+                magenta_on_black
+            } else {
+                white_on_black
+            },
+        );
         y += 1;
 
-        if selection == MainMenuSelection::Quit {
-            draw_batch.print_color_centered(
-                y,
-                "Quit",
-                ColorPair::new(RGB::named(rltk::MAGENTA), RGB::named(rltk::BLACK)),
-            );
-        } else {
-            draw_batch.print_color_centered(
-                y,
-                "Quit",
-                ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
-            );
-        }
+        draw_batch.print_color_centered(
+            y,
+            "Quit",
+            if selection == MainMenuSelection::Quit {
+                magenta_on_black
+            } else {
+                white_on_black
+            },
+        );
 
-        draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
+        draw_batch
+            .submit(6000)
+            .map_err(|err| println!("{:?}", err))
+            .ok();
 
         match ctx.key {
             None => {

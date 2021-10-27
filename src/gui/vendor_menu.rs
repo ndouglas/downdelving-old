@@ -27,6 +27,9 @@ fn vendor_sell_menu(
     let backpack = gs.ecs.read_storage::<InBackpack>();
     let items = gs.ecs.read_storage::<Item>();
     let entities = gs.ecs.entities();
+    let black = RGB::named(rltk::BLACK);
+    let yellow_on_black = ColorPair::new(RGB::named(rltk::YELLOW), black);
+    let white_on_black = ColorPair::new(RGB::named(rltk::WHITE), black);
 
     let inventory = (&backpack, &names)
         .join()
@@ -46,7 +49,7 @@ fn vendor_sell_menu(
     draw_batch.print_color(
         Point::new(18, y + count as i32 + 1),
         "[Esc] cancel [Space] buy",
-        ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
+        yellow_on_black,
     );
 
     let mut equippable: Vec<Entity> = Vec::new();
@@ -55,29 +58,17 @@ fn vendor_sell_menu(
         .join()
         .filter(|item| item.1.owner == *player_entity)
     {
-        draw_batch.set(
-            Point::new(17, y),
-            ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
-            rltk::to_cp437('('),
-        );
+        draw_batch.set(Point::new(17, y), white_on_black, rltk::to_cp437('('));
         draw_batch.set(
             Point::new(18, y),
-            ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
+            yellow_on_black,
             97 + j as rltk::FontCharType,
         );
-        draw_batch.set(
-            Point::new(19, y),
-            ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
-            rltk::to_cp437(')'),
-        );
-
+        draw_batch.set(Point::new(19, y), white_on_black, rltk::to_cp437(')'));
         draw_batch.print_color(
             Point::new(21, y),
             &get_item_display_name(&gs.ecs, entity),
-            ColorPair::new(
-                get_item_color(&gs.ecs, entity),
-                RGB::from_f32(0.0, 0.0, 0.0),
-            ),
+            ColorPair::new(get_item_color(&gs.ecs, entity), black),
         );
         draw_batch.print(
             Point::new(50, y),
@@ -88,7 +79,10 @@ fn vendor_sell_menu(
         j += 1;
     }
 
-    draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
+    draw_batch
+        .submit(6000)
+        .map_err(|err| println!("{:?}", err))
+        .ok();
 
     match ctx.key {
         None => (VendorResult::NoResponse, None, None, None),
@@ -127,6 +121,9 @@ fn vendor_buy_menu(
         &RAWS.lock().unwrap(),
     );
     let count = inventory.len();
+    let black = RGB::named(rltk::BLACK);
+    let yellow_on_black = ColorPair::new(RGB::named(rltk::YELLOW), black);
+    let white_on_black = ColorPair::new(RGB::named(rltk::WHITE), black);
 
     let mut y = (25 - (count / 2)) as i32;
     menu_box(
@@ -140,32 +137,26 @@ fn vendor_buy_menu(
     draw_batch.print_color(
         Point::new(18, y + count as i32 + 1),
         "[Esc] cancel [Space] sell",
-        ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
+        yellow_on_black,
     );
 
     for (j, sale) in inventory.iter().enumerate() {
-        draw_batch.set(
-            Point::new(17, y),
-            ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
-            rltk::to_cp437('('),
-        );
+        draw_batch.set(Point::new(17, y), white_on_black, rltk::to_cp437('('));
         draw_batch.set(
             Point::new(18, y),
-            ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
+            yellow_on_black,
             97 + j as rltk::FontCharType,
         );
-        draw_batch.set(
-            Point::new(19, y),
-            ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
-            rltk::to_cp437(')'),
-        );
-
+        draw_batch.set(Point::new(19, y), white_on_black, rltk::to_cp437(')'));
         draw_batch.print(Point::new(21, y), &sale.0);
         draw_batch.print(Point::new(50, y), &format!("{:.1} gp", sale.1 * 1.2));
         y += 1;
     }
 
-    draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
+    draw_batch
+        .submit(6000)
+        .map_err(|err| println!("{:?}", err))
+        .ok();
 
     match ctx.key {
         None => (VendorResult::NoResponse, None, None, None),

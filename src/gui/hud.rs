@@ -362,5 +362,8 @@ pub fn draw_ui(ecs: &World, ctx: &mut Rltk) {
     );
     draw_tooltips(ecs, ctx);
 
-    draw_batch.submit(5000).map_err(|err| println!("{:?}", err)).ok();
+    draw_batch
+        .submit(5000)
+        .map_err(|err| println!("{:?}", err))
+        .ok();
 }

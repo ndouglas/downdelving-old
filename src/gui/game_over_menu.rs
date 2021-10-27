@@ -55,7 +55,10 @@ pub fn game_over(ctx: &mut Rltk) -> GameOverResult {
         ColorPair::new(RGB::named(rltk::MAGENTA), RGB::named(rltk::BLACK)),
     );
 
-    draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
+    draw_batch
+        .submit(6000)
+        .map_err(|err| println!("{:?}", err))
+        .ok();
 
     match ctx.key {
         None => GameOverResult::NoSelection,

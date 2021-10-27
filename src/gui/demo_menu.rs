@@ -16,18 +16,16 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
     let mut draw_batch = DrawBatch::new();
     let runstate = gs.ecs.fetch::<RunState>();
     let assets = gs.ecs.fetch::<RexAssets>();
+    let black = RGB::named(rltk::BLACK);
+    let wheat_on_black = ColorPair::new(RGB::named(rltk::WHEAT), black);
+    let yellow_on_black = ColorPair::new(RGB::named(rltk::YELLOW), black);
+    let magenta_on_black = ColorPair::new(RGB::named(rltk::MAGENTA), black);
+    let white_on_black = ColorPair::new(RGB::named(rltk::WHITE), black);
     ctx.render_xp_sprite(&assets.menu, 0, 0);
 
-    draw_batch.draw_double_box(
-        Rect::with_size(24, 18, 31, 10),
-        ColorPair::new(RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK)),
-    );
+    draw_batch.draw_double_box(Rect::with_size(24, 18, 31, 10), wheat_on_black);
 
-    draw_batch.print_color_centered(
-        20,
-        "Demos",
-        ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
-    );
+    draw_batch.print_color_centered(20, "Demos", yellow_on_black);
 
     let mut y = 24;
     if let RunState::DemoMenu {
@@ -35,21 +33,19 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
     } = *runstate
     {
         y += 1;
-        if selection == DemoMenuSelection::Exit {
-            draw_batch.print_color_centered(
-                y,
-                "Exit",
-                ColorPair::new(RGB::named(rltk::MAGENTA), RGB::named(rltk::BLACK)),
-            );
-        } else {
-            draw_batch.print_color_centered(
-                y,
-                "Exit",
-                ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),
-            );
-        }
-
-        draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
+        draw_batch.print_color_centered(
+            y,
+            "Exit",
+            if selection == DemoMenuSelection::Exit {
+                magenta_on_black
+            } else {
+                white_on_black
+            },
+        );
+        draw_batch
+            .submit(6000)
+            .map_err(|err| println!("{:?}", err))
+            .ok();
 
         match ctx.key {
             None => {

@@ -2,7 +2,14 @@ use super::ItemMenuResult;
 use rltk::prelude::*;
 use specs::prelude::*;
 
-pub fn menu_box<T: ToString>(draw_batch: &mut DrawBatch, x: i32, y: i32, width: i32, height: i32, title: T) {
+pub fn menu_box<T: ToString>(
+    draw_batch: &mut DrawBatch,
+    x: i32,
+    y: i32,
+    width: i32,
+    height: i32,
+    title: T,
+) {
     draw_batch.draw_box(
         Rect::with_size(x, y - 2, width, height),
         ColorPair::new(RGB::named(rltk::WHITE), RGB::named(rltk::BLACK)),

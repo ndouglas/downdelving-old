@@ -541,7 +541,9 @@ impl GameState for State {
         }
         damage_system::delete_the_dead(&mut self.ecs);
 
-        rltk::render_draw_buffer(ctx).map_err(|err| println!("{:?}", err)).ok();
+        rltk::render_draw_buffer(ctx)
+            .map_err(|err| println!("{:?}", err))
+            .ok();
         if SHOW_FPS {
             ctx.print(1, 59, &format!("FPS: {}", ctx.fps));
         }

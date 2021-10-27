@@ -23,6 +23,9 @@ pub fn remove_item_menu(gs: &mut State, ctx: &mut Rltk) -> (ItemMenuResult, Opti
         &items,
         ctx.key,
     );
-    draw_batch.submit(6000).map_err(|err| println!("{:?}", err)).ok();
+    draw_batch
+        .submit(6000)
+        .map_err(|err| println!("{:?}", err))
+        .ok();
     result
 }
