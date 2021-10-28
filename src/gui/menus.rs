@@ -69,7 +69,7 @@ pub fn item_result_menu<S: ToString>(
     );
     draw_batch.print_color(
         Point::new(18, y + count as i32 + 1),
-        "ESCAPE to cancel",
+        "[Esc] cancel",
         ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
     );
 

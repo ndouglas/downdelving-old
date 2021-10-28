@@ -21,7 +21,7 @@ pub fn show_cheat_mode(_gs: &mut State, ctx: &mut Rltk) -> CheatMenuResult {
     menu_box(&mut draw_batch, 15, y, 31, (count + 3) as i32, "Cheating!");
     draw_batch.print_color(
         Point::new(18, y + count as i32 + 1),
-        "ESCAPE to cancel",
+        "[Esc] cancel",
         ColorPair::new(RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK)),
     );
 
