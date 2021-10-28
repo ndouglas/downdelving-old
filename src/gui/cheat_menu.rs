@@ -1,6 +1,7 @@
 use super::{menu_box, menu_option};
 use crate::State;
 use rltk::prelude::*;
+use rltk::to_cp437;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum CheatMenuResult {
@@ -29,37 +30,19 @@ pub fn show_cheat_mode(_gs: &mut State, ctx: &mut Rltk) -> CheatMenuResult {
         &mut draw_batch,
         17,
         y,
-        rltk::to_cp437('T'),
+        to_cp437('T'),
         "Teleport to next level",
     );
     y += 1;
-    menu_option(
-        &mut draw_batch,
-        17,
-        y,
-        rltk::to_cp437('H'),
-        "Heal all wounds",
-    );
+    menu_option(&mut draw_batch, 17, y, to_cp437('H'), "Heal all wounds");
     y += 1;
-    menu_option(
-        &mut draw_batch,
-        17,
-        y,
-        rltk::to_cp437('R'),
-        "Reveal the map",
-    );
+    menu_option(&mut draw_batch, 17, y, to_cp437('R'), "Reveal the map");
     y += 1;
-    menu_option(
-        &mut draw_batch,
-        17,
-        y,
-        rltk::to_cp437('G'),
-        "God Mode (No Death)",
-    );
+    menu_option(&mut draw_batch, 17, y, to_cp437('G'), "God Mode (No Death)");
     y += 1;
-    menu_option(&mut draw_batch, 17, y, rltk::to_cp437('L'), "Level up");
+    menu_option(&mut draw_batch, 17, y, to_cp437('L'), "Level up");
     y += 1;
-    menu_option(&mut draw_batch, 17, y, rltk::to_cp437('E'), "Eat");
+    menu_option(&mut draw_batch, 17, y, to_cp437('E'), "Eat");
 
     draw_batch
         .submit(6000)
