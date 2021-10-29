@@ -39,6 +39,11 @@ pub enum VendorMode {
 }
 
 #[derive(PartialEq, Copy, Clone)]
+pub enum Demo {
+    AStarPathfinding,
+}
+
+#[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
     AwaitingInput,
     PreRun,
@@ -54,6 +59,9 @@ pub enum RunState {
     },
     DemoMenu {
         menu_selection: gui::DemoMenuSelection,
+    },
+    Demo {
+        demo: Demo,
     },
     SaveGame,
     NextLevel,
@@ -115,6 +123,7 @@ impl GameState for State {
             RunState::MainMenu { .. } => {}
             RunState::DemoMenu { .. } => {}
             RunState::GameOver { .. } => {}
+            RunState::Demo { .. } => {}
             _ => {
                 camera::render_camera(&self.ecs, ctx);
                 gui::draw_ui(&self.ecs, ctx);
@@ -460,6 +469,9 @@ impl GameState for State {
                         }
                     }
                     gui::DemoMenuResult::Selected { selected } => match selected {
+                        gui::DemoMenuSelection::AStarPathfindingDemo => {
+                            newrunstate = RunState::Demo { demo: Demo::AStarPathfinding };
+                        }
                         gui::DemoMenuSelection::Exit => {
                             newrunstate = RunState::MainMenu {
                                 menu_selection: gui::MainMenuSelection::Demos,
@@ -531,6 +543,16 @@ impl GameState for State {
                     newrunstate = RunState::Ticking;
                 } else {
                     newrunstate = RunState::MagicMapReveal { row: row + 1 };
+                }
+            }
+            RunState::Demo { demo } => {
+                match demo {
+                    Demo::AStarPathfinding => {
+                        rltk::console::log("Yep, did the thing.");
+                        newrunstate = RunState::DemoMenu {
+                          menu_selection: gui::DemoMenuSelection::AStarPathfindingDemo,
+                        }
+                    }
                 }
             }
         }

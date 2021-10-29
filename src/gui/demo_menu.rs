@@ -3,6 +3,7 @@ use rltk::prelude::*;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum DemoMenuSelection {
+    AStarPathfindingDemo,
     Exit,
 }
 
@@ -35,6 +36,16 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
         y += 1;
         draw_batch.print_color_centered(
             y,
+            "A* Pathfinding",
+            if selection == DemoMenuSelection::AStarPathfindingDemo {
+                magenta_on_black
+            } else {
+                white_on_black
+            },
+        );
+        y += 1;
+        draw_batch.print_color_centered(
+            y,
             "Exit",
             if selection == DemoMenuSelection::Exit {
                 magenta_on_black
@@ -62,7 +73,8 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                 VirtualKeyCode::Up => {
                     let newselection;
                     match selection {
-                        DemoMenuSelection::Exit => newselection = DemoMenuSelection::Exit,
+                        DemoMenuSelection::Exit => newselection = DemoMenuSelection::AStarPathfindingDemo,
+                        DemoMenuSelection::AStarPathfindingDemo => newselection = DemoMenuSelection::Exit,
                     }
                     return DemoMenuResult::NoSelection {
                         selected: newselection,
@@ -71,7 +83,8 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                 VirtualKeyCode::Down => {
                     let newselection;
                     match selection {
-                        DemoMenuSelection::Exit => newselection = DemoMenuSelection::Exit,
+                        DemoMenuSelection::AStarPathfindingDemo => newselection = DemoMenuSelection::Exit,
+                        DemoMenuSelection::Exit => newselection = DemoMenuSelection::AStarPathfindingDemo,
                     }
                     return DemoMenuResult::NoSelection {
                         selected: newselection,
