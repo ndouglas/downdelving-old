@@ -1,6 +1,6 @@
 use crate::{
-    effects::add_effect, effects::EffectType, effects::Targets, Confusion, MyTurn, RunState,
-    StatusEffect,
+    effects::add_effect, effects::EffectType, effects::Targets, Confusion, MainGameState, MyTurn,
+    RunState, StatusEffect,
 };
 use specs::prelude::*;
 use std::collections::HashSet;
@@ -20,7 +20,11 @@ impl<'a> System<'a> for TurnStatusSystem {
     fn run(&mut self, data: Self::SystemData) {
         let (mut turns, confusion, entities, runstate, statuses) = data;
 
-        if *runstate != RunState::Ticking {
+        if *runstate
+            != (RunState::MainGame {
+                state: MainGameState::Ticking,
+            })
+        {
             return;
         }
 

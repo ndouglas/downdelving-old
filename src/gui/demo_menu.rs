@@ -73,8 +73,12 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                 VirtualKeyCode::Up => {
                     let newselection;
                     match selection {
-                        DemoMenuSelection::Exit => newselection = DemoMenuSelection::AStarPathfindingDemo,
-                        DemoMenuSelection::AStarPathfindingDemo => newselection = DemoMenuSelection::Exit,
+                        DemoMenuSelection::Exit => {
+                            newselection = DemoMenuSelection::AStarPathfindingDemo
+                        }
+                        DemoMenuSelection::AStarPathfindingDemo => {
+                            newselection = DemoMenuSelection::Exit
+                        }
                     }
                     return DemoMenuResult::NoSelection {
                         selected: newselection,
@@ -83,8 +87,12 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                 VirtualKeyCode::Down => {
                     let newselection;
                     match selection {
-                        DemoMenuSelection::AStarPathfindingDemo => newselection = DemoMenuSelection::Exit,
-                        DemoMenuSelection::Exit => newselection = DemoMenuSelection::AStarPathfindingDemo,
+                        DemoMenuSelection::AStarPathfindingDemo => {
+                            newselection = DemoMenuSelection::Exit
+                        }
+                        DemoMenuSelection::Exit => {
+                            newselection = DemoMenuSelection::AStarPathfindingDemo
+                        }
                     }
                     return DemoMenuResult::NoSelection {
                         selected: newselection,

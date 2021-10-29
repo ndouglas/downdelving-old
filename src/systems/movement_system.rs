@@ -1,6 +1,6 @@
 use crate::{
-    ApplyMove, ApplyTeleport, BlocksTile, EntityMoved, Map, OtherLevelPosition, Position, RunState,
-    Viewshed,
+    ApplyMove, ApplyTeleport, BlocksTile, EntityMoved, MainGameState, Map, OtherLevelPosition,
+    Position, RunState, Viewshed,
 };
 use specs::prelude::*;
 
@@ -49,10 +49,12 @@ impl<'a> System<'a> for MovementSystem {
                     )
                     .expect("Unable to insert");
             } else if entity == *player_entity {
-                *runstate = RunState::TeleportingToOtherLevel {
-                    x: teleport.dest_x,
-                    y: teleport.dest_y,
-                    depth: teleport.dest_depth,
+                *runstate = RunState::MainGame {
+                    state: MainGameState::TeleportingToOtherLevel {
+                        x: teleport.dest_x,
+                        y: teleport.dest_y,
+                        depth: teleport.dest_depth,
+                    },
                 };
             } else if let Some(pos) = position.get(entity) {
                 let idx = map.xy_idx(pos.x, pos.y);

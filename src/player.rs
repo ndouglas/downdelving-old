@@ -1,8 +1,8 @@
 use super::{
     raws::Reaction, Attributes, BlocksTile, BlocksVisibility, Door, EntityMoved, Equipped, Faction,
-    HungerClock, HungerState, Item, Map, Name, Player, Pools, Position, Renderable, RunState,
-    State, Target, TileType, Vendor, VendorMode, Viewshed, WantsToCastSpell, WantsToMelee,
-    WantsToPickupItem, WantsToShoot, Weapon,
+    HungerClock, HungerState, Item, MainGameState, Map, Name, Player, Pools, Position, Renderable,
+    RunState, State, Target, TileType, Vendor, VendorMode, Viewshed, WantsToCastSpell,
+    WantsToMelee, WantsToPickupItem, WantsToShoot, Weapon,
 };
 use rltk::{Point, Rltk, VirtualKeyCode};
 use specs::prelude::*;
@@ -81,12 +81,16 @@ fn fire_on_target(ecs: &mut World) -> RunState {
             .insert(*player_entity, WantsToShoot { target })
             .expect("Insert Fail");
 
-        RunState::Ticking
+        RunState::MainGame {
+            state: MainGameState::Ticking,
+        }
     } else {
         crate::gamelog::Logger::new()
             .append("You don't have a target selected!")
             .log();
-        RunState::AwaitingInput
+        RunState::MainGame {
+            state: MainGameState::AwaitingInput,
+        }
     }
 }
 
@@ -138,7 +142,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
     let mut renderables = ecs.write_storage::<Renderable>();
     let factions = ecs.read_storage::<Faction>();
     let vendors = ecs.read_storage::<Vendor>();
-    let mut result = RunState::AwaitingInput;
+    let mut result = RunState::MainGame {
+        state: MainGameState::AwaitingInput,
+    };
 
     let mut swap_entities: Vec<(Entity, i32, i32)> = Vec::new();
 
@@ -150,7 +156,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
             || pos.y + delta_y < 1
             || pos.y + delta_y > map.height - 1
         {
-            return RunState::AwaitingInput;
+            return RunState::MainGame {
+                state: MainGameState::AwaitingInput,
+            };
         }
         let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
 
@@ -158,9 +166,11 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
             destination_idx,
             |potential_target| {
                 if let Some(_vendor) = vendors.get(potential_target) {
-                    return Some(RunState::ShowVendor {
-                        vendor: potential_target,
-                        mode: VendorMode::Sell,
+                    return Some(RunState::MainGame {
+                        state: MainGameState::ShowVendor {
+                            vendor: potential_target,
+                            mode: VendorMode::Sell,
+                        },
                     });
                 }
 
@@ -192,7 +202,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
                     let mut ppos = ecs.write_resource::<Point>();
                     ppos.x = pos.x;
                     ppos.y = pos.y;
-                    return Some(RunState::Ticking);
+                    return Some(RunState::MainGame {
+                        state: MainGameState::Ticking,
+                    });
                 } else {
                     let target = combat_stats.get(potential_target);
                     if let Some(_target) = target {
@@ -204,7 +216,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
                                 },
                             )
                             .expect("Add target failed");
-                        return Some(RunState::Ticking);
+                        return Some(RunState::MainGame {
+                            state: MainGameState::Ticking,
+                        });
                     }
                 }
                 let door = doors.get_mut(potential_target);
@@ -215,7 +229,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
                     let glyph = renderables.get_mut(potential_target).unwrap();
                     glyph.glyph = rltk::to_cp437('/');
                     viewshed.dirty = true;
-                    return Some(RunState::Ticking);
+                    return Some(RunState::MainGame {
+                        state: MainGameState::Ticking,
+                    });
                 }
                 None
             },
@@ -232,10 +248,20 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
             let mut ppos = ecs.write_resource::<Point>();
             ppos.x = pos.x;
             ppos.y = pos.y;
-            result = RunState::Ticking;
+            result = RunState::MainGame {
+                state: MainGameState::Ticking,
+            };
             match map.tiles[destination_idx] {
-                TileType::DownStairs => result = RunState::NextLevel,
-                TileType::UpStairs => result = RunState::PreviousLevel,
+                TileType::DownStairs => {
+                    result = RunState::MainGame {
+                        state: MainGameState::NextLevel,
+                    }
+                }
+                TileType::UpStairs => {
+                    result = RunState::MainGame {
+                        state: MainGameState::PreviousLevel,
+                    }
+                }
                 _ => {}
             }
         }
@@ -361,7 +387,9 @@ fn skip_turn(ecs: &mut World) -> RunState {
         }
     }
 
-    RunState::Ticking
+    RunState::MainGame {
+        state: MainGameState::Ticking,
+    }
 }
 
 fn use_consumable_hotkey(gs: &mut State, key: i32) -> RunState {
@@ -385,9 +413,11 @@ fn use_consumable_hotkey(gs: &mut State, key: i32) -> RunState {
             .read_storage::<Ranged>()
             .get(carried_consumables[key as usize])
         {
-            return RunState::ShowTargeting {
-                range: ranged.range,
-                item: carried_consumables[key as usize],
+            return RunState::MainGame {
+                state: MainGameState::ShowTargeting {
+                    range: ranged.range,
+                    item: carried_consumables[key as usize],
+                },
             };
         }
         let mut intent = gs.ecs.write_storage::<WantsToUseItem>();
@@ -400,9 +430,13 @@ fn use_consumable_hotkey(gs: &mut State, key: i32) -> RunState {
                 },
             )
             .expect("Unable to insert intent");
-        return RunState::Ticking;
+        return RunState::MainGame {
+            state: MainGameState::Ticking,
+        };
     }
-    RunState::Ticking
+    RunState::MainGame {
+        state: MainGameState::Ticking,
+    }
 }
 
 fn use_spell_hotkey(gs: &mut State, key: i32) -> RunState {
@@ -422,9 +456,11 @@ fn use_spell_hotkey(gs: &mut State, key: i32) -> RunState {
             {
                 use crate::components::Ranged;
                 if let Some(ranged) = gs.ecs.read_storage::<Ranged>().get(spell_entity) {
-                    return RunState::ShowTargeting {
-                        range: ranged.range,
-                        item: spell_entity,
+                    return RunState::MainGame {
+                        state: MainGameState::ShowTargeting {
+                            range: ranged.range,
+                            item: spell_entity,
+                        },
                     };
                 };
                 let mut intent = gs.ecs.write_storage::<WantsToCastSpell>();
@@ -437,7 +473,9 @@ fn use_spell_hotkey(gs: &mut State, key: i32) -> RunState {
                         },
                     )
                     .expect("Unable to insert intent");
-                return RunState::Ticking;
+                return RunState::MainGame {
+                    state: MainGameState::Ticking,
+                };
             }
         } else {
             crate::gamelog::Logger::new()
@@ -446,7 +484,9 @@ fn use_spell_hotkey(gs: &mut State, key: i32) -> RunState {
         }
     }
 
-    RunState::Ticking
+    RunState::MainGame {
+        state: MainGameState::Ticking,
+    }
 }
 
 pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
@@ -488,7 +528,11 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
 
     // Player movement
     match ctx.key {
-        None => return RunState::AwaitingInput, // Nothing happened
+        None => {
+            return RunState::MainGame {
+                state: MainGameState::AwaitingInput,
+            }
+        } // Nothing happened
         Some(key) => match key {
             VirtualKeyCode::Left | VirtualKeyCode::Numpad4 | VirtualKeyCode::H => {
                 return try_move_player(-1, 0, &mut gs.ecs)
@@ -529,36 +573,68 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             // Level changes
             VirtualKeyCode::Period => {
                 if try_next_level(&mut gs.ecs) {
-                    return RunState::NextLevel;
+                    return RunState::MainGame {
+                        state: MainGameState::NextLevel,
+                    };
                 }
             }
             VirtualKeyCode::Comma => {
                 if try_previous_level(&mut gs.ecs) {
-                    return RunState::PreviousLevel;
+                    return RunState::MainGame {
+                        state: MainGameState::PreviousLevel,
+                    };
                 }
             }
 
             // Picking up items
             VirtualKeyCode::G => get_item(&mut gs.ecs),
-            VirtualKeyCode::I => return RunState::ShowInventory,
-            VirtualKeyCode::D => return RunState::ShowDropItem,
-            VirtualKeyCode::R => return RunState::ShowRemoveItem,
+            VirtualKeyCode::I => {
+                return RunState::MainGame {
+                    state: MainGameState::ShowInventory,
+                }
+            }
+            VirtualKeyCode::D => {
+                return RunState::MainGame {
+                    state: MainGameState::ShowDropItem,
+                }
+            }
+            VirtualKeyCode::R => {
+                return RunState::MainGame {
+                    state: MainGameState::ShowRemoveItem,
+                }
+            }
 
             // Ranged
             VirtualKeyCode::V => {
                 cycle_target(&mut gs.ecs);
-                return RunState::AwaitingInput;
+                return RunState::MainGame {
+                    state: MainGameState::AwaitingInput,
+                };
             }
             VirtualKeyCode::F => return fire_on_target(&mut gs.ecs),
 
             // Save and Quit
-            VirtualKeyCode::Escape => return RunState::SaveGame,
+            VirtualKeyCode::Escape => {
+                return RunState::MainGame {
+                    state: MainGameState::SaveGame,
+                }
+            }
 
             // Cheating!
-            VirtualKeyCode::Backslash => return RunState::ShowCheatMenu,
+            VirtualKeyCode::Backslash => {
+                return RunState::MainGame {
+                    state: MainGameState::ShowCheatMenu,
+                }
+            }
 
-            _ => return RunState::AwaitingInput,
+            _ => {
+                return RunState::MainGame {
+                    state: MainGameState::AwaitingInput,
+                }
+            }
         },
     }
-    RunState::Ticking
+    RunState::MainGame {
+        state: MainGameState::Ticking,
+    }
 }

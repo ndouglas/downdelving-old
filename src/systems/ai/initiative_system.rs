@@ -1,6 +1,6 @@
 use crate::{
-    Attributes, DamageOverTime, Duration, EquipmentChanged, Initiative, MyTurn, Pools, Position,
-    RunState, StatusEffect,
+    Attributes, DamageOverTime, Duration, EquipmentChanged, Initiative, MainGameState, MyTurn,
+    Pools, Position, RunState, StatusEffect,
 };
 use specs::prelude::*;
 
@@ -41,7 +41,11 @@ impl<'a> System<'a> for InitiativeSystem {
             dots,
         ) = data;
 
-        if *runstate != RunState::Ticking {
+        if *runstate
+            != (RunState::MainGame {
+                state: MainGameState::Ticking,
+            })
+        {
             return;
         }
 
@@ -72,7 +76,9 @@ impl<'a> System<'a> for InitiativeSystem {
                 // If its the player, we want to go to an AwaitingInput state
                 if entity == *player {
                     // Give control to the player
-                    *runstate = RunState::AwaitingInput;
+                    *runstate = RunState::MainGame {
+                        state: MainGameState::AwaitingInput,
+                    };
                 } else {
                     let distance = rltk::DistanceAlg::Pythagoras
                         .distance2d(*player_pos, rltk::Point::new(pos.x, pos.y));
@@ -91,7 +97,11 @@ impl<'a> System<'a> for InitiativeSystem {
         }
 
         // Handle durations
-        if *runstate == RunState::AwaitingInput {
+        if *runstate
+            == (RunState::MainGame {
+                state: MainGameState::AwaitingInput,
+            })
+        {
             use crate::effects::*;
             for (effect_entity, duration, status) in (&entities, &mut durations, &statuses).join() {
                 if entities.is_alive(status.target) {

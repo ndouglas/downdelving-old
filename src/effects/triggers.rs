@@ -1,6 +1,6 @@
 use super::*;
 use crate::components::*;
-use crate::RunState;
+use crate::{MainGameState, RunState};
 
 pub fn item_trigger(creator: Option<Entity>, item: Entity, targets: &Targets, ecs: &mut World) {
     // Check charges
@@ -153,7 +153,9 @@ fn event_trigger(
         crate::gamelog::Logger::new()
             .append("The map is revealed to you!")
             .log();
-        *runstate = RunState::MagicMapReveal { row: 0 };
+        *runstate = RunState::MainGame {
+            state: MainGameState::MagicMapReveal { row: 0 },
+        };
         did_something = true;
     }
 
@@ -164,7 +166,9 @@ fn event_trigger(
         .is_some()
     {
         let mut runstate = ecs.fetch_mut::<RunState>();
-        *runstate = RunState::ShowRemoveCurse;
+        *runstate = RunState::MainGame {
+            state: MainGameState::ShowRemoveCurse,
+        };
         did_something = true;
     }
 
@@ -175,7 +179,9 @@ fn event_trigger(
         .is_some()
     {
         let mut runstate = ecs.fetch_mut::<RunState>();
-        *runstate = RunState::ShowIdentify;
+        *runstate = RunState::MainGame {
+            state: MainGameState::ShowIdentify,
+        };
         did_something = true;
     }
 
@@ -191,7 +197,9 @@ fn event_trigger(
                 .append("You are telported back to town!")
                 .log();
             let mut runstate = ecs.fetch_mut::<RunState>();
-            *runstate = RunState::TownPortal;
+            *runstate = RunState::MainGame {
+                state: MainGameState::TownPortal,
+            };
             did_something = true;
         }
     }

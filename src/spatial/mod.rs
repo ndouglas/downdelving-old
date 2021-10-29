@@ -1,4 +1,4 @@
-use crate::{tile_walkable, Map, RunState};
+use crate::{tile_walkable, MainGameState, Map, RunState};
 use specs::prelude::*;
 use std::sync::Mutex;
 
@@ -83,7 +83,9 @@ where
         }
     }
 
-    RunState::AwaitingInput
+    RunState::MainGame {
+        state: MainGameState::AwaitingInput,
+    }
 }
 
 pub fn get_tile_content_clone(idx: usize) -> Vec<Entity> {
