@@ -13,7 +13,7 @@ mod rect;
 pub use rect::Rect;
 mod damage_system;
 mod gamelog;
-mod gamesystem;
+mod game_system;
 mod gui;
 pub mod map_builders;
 pub mod random_table;
@@ -21,7 +21,7 @@ pub mod raws;
 pub mod rex_assets;
 pub mod saveload_system;
 mod spawner;
-pub use gamesystem::*;
+pub use game_system::*;
 pub mod effects;
 #[macro_use]
 extern crate lazy_static;

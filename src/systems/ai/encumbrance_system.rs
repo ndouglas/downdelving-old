@@ -1,5 +1,5 @@
 use crate::{
-    gamesystem::attr_bonus, AttributeBonus, Attributes, EquipmentChanged, Equipped, InBackpack,
+    game_system::attr_bonus, AttributeBonus, Attributes, EquipmentChanged, Equipped, InBackpack,
     Item, Pools, Slow, StatusEffect,
 };
 use specs::prelude::*;

@@ -1,6 +1,6 @@
 use super::*;
 use crate::components::{Attributes, EquipmentChanged, Pools, Skills};
-use crate::gamesystem::{mana_at_level, player_hp_at_level};
+use crate::game_system::{mana_at_level, player_hp_at_level};
 
 pub fn add_experience(ecs: &mut World, experience_effect: &EffectSpawner, target: Entity) {
     let mut pools = ecs.write_storage::<Pools>();
