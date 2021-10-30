@@ -1,9 +1,10 @@
 use super::{
     raws::Reaction, Attributes, BlocksTile, BlocksVisibility, Door, EntityMoved, Equipped, Faction,
     HungerClock, HungerState, Item, MainGameRunState, Map, Name, Player, Pools, Position,
-    Renderable, RunState, State, Target, TileType, Vendor, VendorMode, Viewshed, WantsToCastSpell,
+    Renderable, RunState, State, Target, TileType, Vendor, Viewshed, WantsToCastSpell,
     WantsToMelee, WantsToPickupItem, WantsToShoot, Weapon,
 };
+use crate::main_game::VendorMode;
 use rltk::{Point, Rltk, VirtualKeyCode};
 use specs::prelude::*;
 use std::cmp::{max, min};

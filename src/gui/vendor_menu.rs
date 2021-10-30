@@ -1,5 +1,6 @@
 use super::{get_item_color, get_item_display_name, menu_box};
-use crate::{InBackpack, Item, Name, State, Vendor, VendorMode};
+use crate::main_game::VendorMode;
+use crate::{InBackpack, Item, Name, State, Vendor};
 use rltk::prelude::*;
 use specs::prelude::*;
 

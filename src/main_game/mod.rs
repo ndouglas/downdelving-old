@@ -13,8 +13,13 @@ use crate::saveload_system;
 use crate::spawner;
 use crate::RunState;
 use crate::State;
-use crate::VendorMode;
 use crate::SHOW_MAPGEN_VISUALIZER;
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum VendorMode {
+    Buy,
+    Sell,
+}
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum MainGameRunState {

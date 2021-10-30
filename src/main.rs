@@ -34,12 +34,6 @@ const SHOW_MAPGEN_VISUALIZER: bool = false;
 const SHOW_FPS: bool = true;
 
 #[derive(PartialEq, Copy, Clone)]
-pub enum VendorMode {
-    Buy,
-    Sell,
-}
-
-#[derive(PartialEq, Copy, Clone)]
 pub enum Demo {
     AStarPathfinding,
 }
