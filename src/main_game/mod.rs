@@ -484,15 +484,8 @@ pub fn tick(state: &mut State, ctx: &mut Rltk, runstate: &RunState) -> RunState 
             }
             MainGameRunState::ShowVendor { vendor, mode } => {
                 let result = gui::show_vendor_menu(state, ctx, vendor, mode);
-                newrunstate = vendor::handle_vendor_result(
-                    &mut state.ecs,
-                    vendor,
-                    newrunstate,
-                    result.0,
-                    result.1,
-                    result.2,
-                    result.3,
-                );
+                newrunstate =
+                    vendor::handle_vendor_result(&mut state.ecs, vendor, newrunstate, result);
             }
 
             MainGameRunState::GameOver => {

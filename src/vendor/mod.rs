@@ -24,13 +24,10 @@ pub fn handle_vendor_result(
     ecs: &mut World,
     vendor_entity: Entity,
     current_runstate: RunState,
-    vendor_result: VendorResult,
-    entity_option: Option<Entity>,
-    tag_option: Option<String>,
-    price_option: Option<f32>,
+    vendor_result: (VendorResult, Option<Entity>, Option<String>, Option<f32>),
 ) -> RunState {
     let mut newrunstate = current_runstate;
-    match vendor_result {
+    match vendor_result.0 {
         VendorResult::Cancel => {
             newrunstate = RunState::MainGame {
                 runstate: MainGameRunState::AwaitingInput,
@@ -54,7 +51,7 @@ pub fn handle_vendor_result(
         }
         VendorResult::NoResponse => {}
         VendorResult::Sell => {
-            let entity = entity_option.unwrap();
+            let entity = vendor_result.1.unwrap();
             let price = ecs.read_storage::<Item>().get(entity).unwrap().base_value * 0.8;
             ecs.write_storage::<Pools>()
                 .get_mut(*ecs.fetch::<Entity>())
@@ -63,8 +60,8 @@ pub fn handle_vendor_result(
             ecs.delete_entity(entity).expect("Unable to delete");
         }
         VendorResult::Buy => {
-            let tag = tag_option.unwrap();
-            let price = price_option.unwrap();
+            let tag = vendor_result.2.unwrap();
+            let price = vendor_result.3.unwrap();
             let mut pools = ecs.write_storage::<Pools>();
             let player_entity = ecs.fetch::<Entity>();
             let mut identified = ecs.write_storage::<IdentifiedItem>();
