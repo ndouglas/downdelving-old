@@ -1,4 +1,8 @@
+extern crate derivative;
 extern crate serde;
+#[macro_use]
+extern crate lazy_static;
+
 use rltk::{GameState, Point, Rltk};
 use specs::prelude::*;
 use specs::saveload::SimpleMarkerAllocator;
@@ -11,6 +15,7 @@ mod player;
 mod rect;
 pub use rect::Rect;
 mod damage_system;
+mod demos;
 mod game_system;
 mod gamelog;
 mod gui;
@@ -24,8 +29,6 @@ pub mod saveload_system;
 mod spawner;
 pub use game_system::*;
 pub mod effects;
-#[macro_use]
-extern crate lazy_static;
 pub mod rng;
 pub mod spatial;
 mod systems;
@@ -33,11 +36,6 @@ pub mod vendor;
 
 const SHOW_MAPGEN_VISUALIZER: bool = false;
 const SHOW_FPS: bool = true;
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum Demo {
-    AStarPathfinding,
-}
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
@@ -48,7 +46,7 @@ pub enum RunState {
         menu_selection: gui::DemoMenuSelection,
     },
     Demo {
-        demo: Demo,
+        demo: demos::Demo,
     },
     MainGame {
         runstate: MainGameRunState,
@@ -101,7 +99,6 @@ impl GameState for State {
             RunState::MainGame { .. } => {
                 newrunstate = main_game::tick(self, ctx, &newrunstate);
             }
-
             RunState::MainMenu { .. } => {
                 let result = gui::main_menu(self, ctx);
                 match result {
@@ -147,28 +144,14 @@ impl GameState for State {
                             menu_selection: selected,
                         }
                     }
-                    gui::DemoMenuResult::Selected { selected } => match selected {
-                        gui::DemoMenuSelection::AStarPathfindingDemo => {
-                            newrunstate = RunState::Demo {
-                                demo: Demo::AStarPathfinding,
-                            };
-                        }
-                        gui::DemoMenuSelection::Exit => {
-                            newrunstate = RunState::MainMenu {
-                                menu_selection: gui::MainMenuSelection::Demos,
-                            }
-                        }
-                    },
-                }
-            }
-            RunState::Demo { demo } => match demo {
-                Demo::AStarPathfinding => {
-                    rltk::console::log("Yep, did the thing.");
-                    newrunstate = RunState::DemoMenu {
-                        menu_selection: gui::DemoMenuSelection::AStarPathfindingDemo,
+                    gui::DemoMenuResult::Selected { selected } => {
+                        newrunstate = demos::select_demo(selected);
                     }
                 }
-            },
+            }
+            RunState::Demo { .. } => {
+                newrunstate = demos::tick(self, ctx, &newrunstate);
+            }
         }
 
         {
