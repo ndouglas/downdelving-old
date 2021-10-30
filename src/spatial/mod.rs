@@ -1,4 +1,4 @@
-use crate::{tile_walkable, MainGameState, Map, RunState};
+use crate::{tile_walkable, MainGameRunState, Map, RunState};
 use specs::prelude::*;
 use std::sync::Mutex;
 
@@ -84,7 +84,7 @@ where
     }
 
     RunState::MainGame {
-        state: MainGameState::AwaitingInput,
+        runstate: MainGameRunState::AwaitingInput,
     }
 }
 

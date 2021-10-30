@@ -1,6 +1,6 @@
 use super::*;
 use crate::components::*;
-use crate::{MainGameState, RunState};
+use crate::{MainGameRunState, RunState};
 
 pub fn item_trigger(creator: Option<Entity>, item: Entity, targets: &Targets, ecs: &mut World) {
     // Check charges
@@ -154,7 +154,7 @@ fn event_trigger(
             .append("The map is revealed to you!")
             .log();
         *runstate = RunState::MainGame {
-            state: MainGameState::MagicMapReveal { row: 0 },
+            runstate: MainGameRunState::MagicMapReveal { row: 0 },
         };
         did_something = true;
     }
@@ -167,7 +167,7 @@ fn event_trigger(
     {
         let mut runstate = ecs.fetch_mut::<RunState>();
         *runstate = RunState::MainGame {
-            state: MainGameState::ShowRemoveCurse,
+            runstate: MainGameRunState::ShowRemoveCurse,
         };
         did_something = true;
     }
@@ -180,7 +180,7 @@ fn event_trigger(
     {
         let mut runstate = ecs.fetch_mut::<RunState>();
         *runstate = RunState::MainGame {
-            state: MainGameState::ShowIdentify,
+            runstate: MainGameRunState::ShowIdentify,
         };
         did_something = true;
     }
@@ -198,7 +198,7 @@ fn event_trigger(
                 .log();
             let mut runstate = ecs.fetch_mut::<RunState>();
             *runstate = RunState::MainGame {
-                state: MainGameState::TownPortal,
+                runstate: MainGameRunState::TownPortal,
             };
             did_something = true;
         }

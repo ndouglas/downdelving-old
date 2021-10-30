@@ -1,5 +1,5 @@
 use crate::{
-    Attributes, DamageOverTime, Duration, EquipmentChanged, Initiative, MainGameState, MyTurn,
+    Attributes, DamageOverTime, Duration, EquipmentChanged, Initiative, MainGameRunState, MyTurn,
     Pools, Position, RunState, StatusEffect,
 };
 use specs::prelude::*;
@@ -43,7 +43,7 @@ impl<'a> System<'a> for InitiativeSystem {
 
         if *runstate
             != (RunState::MainGame {
-                state: MainGameState::Ticking,
+                runstate: MainGameRunState::Ticking,
             })
         {
             return;
@@ -77,7 +77,7 @@ impl<'a> System<'a> for InitiativeSystem {
                 if entity == *player {
                     // Give control to the player
                     *runstate = RunState::MainGame {
-                        state: MainGameState::AwaitingInput,
+                        runstate: MainGameRunState::AwaitingInput,
                     };
                 } else {
                     let distance = rltk::DistanceAlg::Pythagoras
@@ -99,7 +99,7 @@ impl<'a> System<'a> for InitiativeSystem {
         // Handle durations
         if *runstate
             == (RunState::MainGame {
-                state: MainGameState::AwaitingInput,
+                runstate: MainGameRunState::AwaitingInput,
             })
         {
             use crate::effects::*;

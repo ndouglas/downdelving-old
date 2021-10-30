@@ -1,5 +1,5 @@
 use crate::{
-    ApplyMove, ApplyTeleport, BlocksTile, EntityMoved, MainGameState, Map, OtherLevelPosition,
+    ApplyMove, ApplyTeleport, BlocksTile, EntityMoved, MainGameRunState, Map, OtherLevelPosition,
     Position, RunState, Viewshed,
 };
 use specs::prelude::*;
@@ -50,7 +50,7 @@ impl<'a> System<'a> for MovementSystem {
                     .expect("Unable to insert");
             } else if entity == *player_entity {
                 *runstate = RunState::MainGame {
-                    state: MainGameState::TeleportingToOtherLevel {
+                    runstate: MainGameRunState::TeleportingToOtherLevel {
                         x: teleport.dest_x,
                         y: teleport.dest_y,
                         depth: teleport.dest_depth,

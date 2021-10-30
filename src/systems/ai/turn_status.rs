@@ -1,6 +1,6 @@
 use crate::{
-    effects::add_effect, effects::EffectType, effects::Targets, Confusion, MainGameState, MyTurn,
-    RunState, StatusEffect,
+    effects::add_effect, effects::EffectType, effects::Targets, Confusion, MainGameRunState,
+    MyTurn, RunState, StatusEffect,
 };
 use specs::prelude::*;
 use std::collections::HashSet;
@@ -22,7 +22,7 @@ impl<'a> System<'a> for TurnStatusSystem {
 
         if *runstate
             != (RunState::MainGame {
-                state: MainGameState::Ticking,
+                runstate: MainGameRunState::Ticking,
             })
         {
             return;

@@ -1,5 +1,5 @@
 use super::{
-    Equipped, InBackpack, LootTable, MainGameState, Name, Player, Pools, Position, RunState,
+    Equipped, InBackpack, LootTable, MainGameRunState, Name, Player, Pools, Position, RunState,
 };
 use specs::prelude::*;
 
@@ -29,7 +29,7 @@ pub fn delete_the_dead(ecs: &mut World) {
                     Some(_) => {
                         let mut runstate = ecs.write_resource::<RunState>();
                         *runstate = RunState::MainGame {
-                            state: MainGameState::GameOver,
+                            runstate: MainGameRunState::GameOver,
                         };
                     }
                 }
