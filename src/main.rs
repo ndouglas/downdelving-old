@@ -1,6 +1,7 @@
 extern crate serde;
 use rltk::{GameState, Point, Rltk};
 use specs::prelude::*;
+use specs::saveload::SimpleMarkerAllocator;
 
 mod components;
 pub use components::*;
@@ -806,6 +807,7 @@ fn main() -> rltk::BError {
         dispatcher: systems::build(),
     };
     register_all(&mut gs.ecs);
+    gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
     raws::load_raws();
 

@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
+use specs::saveload::SimpleMarker;
 
 mod components;
 pub use components::*;
@@ -87,5 +87,4 @@ pub fn register_all(ecs: &mut World) {
     ecs.register::<Target>();
     ecs.register::<WantsToShoot>();
     ecs.register::<Bleeds>();
-    ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 }
