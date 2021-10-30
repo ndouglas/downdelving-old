@@ -185,8 +185,20 @@ impl DemoState {
                 }
             }
         } else if self.mode == Mode::Moving {
-            self.player_position = self.path.steps[0] as usize;
+            let mut step = self.path.steps[0] as usize;
             self.path.steps.remove(0);
+            if ! self.is_exit_valid((step % self.width as usize) as i32, (step / self.width as usize) as i32) {
+              let goal = self.path.destination;
+              let path = a_star_search(self.player_position, goal, self);
+              if path.steps.len() == 0 {
+                self.mode = Mode::Waiting;
+              }
+              else {
+                step = path.steps[0] as usize;
+                self.path = path;
+              }
+            }
+            self.player_position = step;
             if self.path.steps.is_empty() {
                 self.mode = Mode::Waiting;
             }
