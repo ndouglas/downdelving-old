@@ -52,6 +52,7 @@ pub fn handle_vendor_result(
         VendorResult::NoResponse => {}
         VendorResult::Sell => {
             let entity = vendor_result.1.unwrap();
+            // @todo: Modify based on charisma (see #52).
             let price = ecs.read_storage::<Item>().get(entity).unwrap().base_value * 0.8;
             ecs.write_storage::<Pools>()
                 .get_mut(*ecs.fetch::<Entity>())
