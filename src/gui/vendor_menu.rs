@@ -1,18 +1,8 @@
 use super::{get_item_color, get_item_display_name, menu_box};
-use crate::main_game::VendorMode;
+use crate::vendor::{VendorMode, VendorResult};
 use crate::{InBackpack, Item, Name, State, Vendor};
 use rltk::prelude::*;
 use specs::prelude::*;
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum VendorResult {
-    NoResponse,
-    Cancel,
-    Sell,
-    BuyMode,
-    SellMode,
-    Buy,
-}
 
 const VENDOR_MENU_WIDTH: i32 = 45;
 

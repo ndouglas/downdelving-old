@@ -11,15 +11,11 @@ use crate::player;
 use crate::player::*;
 use crate::saveload_system;
 use crate::spawner;
+use crate::vendor;
+use crate::vendor::VendorMode;
 use crate::RunState;
 use crate::State;
 use crate::SHOW_MAPGEN_VISUALIZER;
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum VendorMode {
-    Buy,
-    Sell,
-}
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum MainGameRunState {
@@ -487,75 +483,16 @@ pub fn tick(state: &mut State, ctx: &mut Rltk, runstate: &RunState) -> RunState 
                 }
             }
             MainGameRunState::ShowVendor { vendor, mode } => {
-                use crate::raws::*;
                 let result = gui::show_vendor_menu(state, ctx, vendor, mode);
-                match result.0 {
-                    gui::VendorResult::Cancel => {
-                        newrunstate = RunState::MainGame {
-                            runstate: MainGameRunState::AwaitingInput,
-                        }
-                    }
-                    gui::VendorResult::NoResponse => {}
-                    gui::VendorResult::Sell => {
-                        let price = state
-                            .ecs
-                            .read_storage::<Item>()
-                            .get(result.1.unwrap())
-                            .unwrap()
-                            .base_value
-                            * 0.8;
-                        state
-                            .ecs
-                            .write_storage::<Pools>()
-                            .get_mut(*state.ecs.fetch::<Entity>())
-                            .unwrap()
-                            .gold += price;
-                        state
-                            .ecs
-                            .delete_entity(result.1.unwrap())
-                            .expect("Unable to delete");
-                    }
-                    gui::VendorResult::Buy => {
-                        let tag = result.2.unwrap();
-                        let price = result.3.unwrap();
-                        let mut pools = state.ecs.write_storage::<Pools>();
-                        let player_entity = state.ecs.fetch::<Entity>();
-                        let mut identified = state.ecs.write_storage::<IdentifiedItem>();
-                        identified
-                            .insert(*player_entity, IdentifiedItem { name: tag.clone() })
-                            .expect("Unable to insert");
-                        std::mem::drop(identified);
-                        let player_pools = pools.get_mut(*player_entity).unwrap();
-                        std::mem::drop(player_entity);
-                        if player_pools.gold >= price {
-                            player_pools.gold -= price;
-                            std::mem::drop(pools);
-                            let player_entity = *state.ecs.fetch::<Entity>();
-                            crate::raws::spawn_named_item(
-                                &RAWS.lock().unwrap(),
-                                &mut state.ecs,
-                                &tag,
-                                SpawnType::Carried { by: player_entity },
-                            );
-                        }
-                    }
-                    gui::VendorResult::BuyMode => {
-                        newrunstate = RunState::MainGame {
-                            runstate: MainGameRunState::ShowVendor {
-                                vendor,
-                                mode: VendorMode::Buy,
-                            },
-                        }
-                    }
-                    gui::VendorResult::SellMode => {
-                        newrunstate = RunState::MainGame {
-                            runstate: MainGameRunState::ShowVendor {
-                                vendor,
-                                mode: VendorMode::Sell,
-                            },
-                        }
-                    }
-                }
+                newrunstate = vendor::handle_vendor_result(
+                    &mut state.ecs,
+                    vendor,
+                    newrunstate,
+                    result.0,
+                    result.1,
+                    result.2,
+                    result.3,
+                );
             }
 
             MainGameRunState::GameOver => {

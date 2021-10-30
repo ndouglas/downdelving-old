@@ -4,7 +4,7 @@ use super::{
     Renderable, RunState, State, Target, TileType, Vendor, Viewshed, WantsToCastSpell,
     WantsToMelee, WantsToPickupItem, WantsToShoot, Weapon,
 };
-use crate::main_game::VendorMode;
+use crate::vendor::VendorMode;
 use rltk::{Point, Rltk, VirtualKeyCode};
 use specs::prelude::*;
 use std::cmp::{max, min};
