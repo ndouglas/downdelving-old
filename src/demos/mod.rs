@@ -6,16 +6,21 @@ use rltk;
 use rltk::Rltk;
 
 pub mod astar_pathfinding;
+pub mod walking_around;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum Demo {
     AStarPathfinding,
+    WalkingAround,
 }
 
 pub fn select_demo(selected: DemoMenuSelection) -> RunState {
     match selected {
         DemoMenuSelection::AStarPathfindingDemo => RunState::Demo {
             demo: Demo::AStarPathfinding,
+        },
+        DemoMenuSelection::WalkingAroundDemo => RunState::Demo {
+            demo: Demo::WalkingAround,
         },
         DemoMenuSelection::Exit => RunState::MainMenu {
             menu_selection: gui::MainMenuSelection::Demos,
@@ -31,6 +36,9 @@ pub fn tick(_state: &mut State, ctx: &mut Rltk, runstate: &RunState) -> RunState
         RunState::Demo { demo } => match demo {
             Demo::AStarPathfinding => {
                 newrunstate = astar_pathfinding::tick(ctx, runstate);
+            }
+            Demo::WalkingAround => {
+                newrunstate = walking_around::tick(ctx, runstate);
             }
         },
         _ => {}

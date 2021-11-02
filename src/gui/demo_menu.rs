@@ -4,6 +4,7 @@ use rltk::prelude::*;
 #[derive(PartialEq, Copy, Clone)]
 pub enum DemoMenuSelection {
     AStarPathfindingDemo,
+    WalkingAroundDemo,
     Exit,
 }
 
@@ -46,6 +47,16 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
         y += 1;
         draw_batch.print_color_centered(
             y,
+            "Walking Around",
+            if selection == DemoMenuSelection::WalkingAroundDemo {
+                magenta_on_black
+            } else {
+                white_on_black
+            },
+        );
+        y += 1;
+        draw_batch.print_color_centered(
+            y,
             "Exit",
             if selection == DemoMenuSelection::Exit {
                 magenta_on_black
@@ -73,11 +84,14 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                 VirtualKeyCode::Up => {
                     let newselection;
                     match selection {
-                        DemoMenuSelection::Exit => {
-                            newselection = DemoMenuSelection::AStarPathfindingDemo
-                        }
                         DemoMenuSelection::AStarPathfindingDemo => {
                             newselection = DemoMenuSelection::Exit
+                        }
+                        DemoMenuSelection::WalkingAroundDemo => {
+                            newselection = DemoMenuSelection::AStarPathfindingDemo
+                        }
+                        DemoMenuSelection::Exit => {
+                            newselection = DemoMenuSelection::WalkingAroundDemo
                         }
                     }
                     return DemoMenuResult::NoSelection {
@@ -88,6 +102,9 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                     let newselection;
                     match selection {
                         DemoMenuSelection::AStarPathfindingDemo => {
+                            newselection = DemoMenuSelection::WalkingAroundDemo
+                        }
+                        DemoMenuSelection::WalkingAroundDemo => {
                             newselection = DemoMenuSelection::Exit
                         }
                         DemoMenuSelection::Exit => {

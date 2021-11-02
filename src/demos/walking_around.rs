@@ -84,12 +84,13 @@ impl DemoState {
         }
     }
 
-    pub fn is_exit_valid(&self, x: i32, y: i32) -> bool {
-        if x < 1 || x > self.width - 1 || y < 1 || y > self.height - 1 {
-            return false;
+    pub fn move_player(&mut self, delta_x: i32, delta_y: i32) {
+        let current_position = idx_xy(self.width.try_into().unwrap(), self.player_position);
+        let new_position = (current_position.0 + delta_x, current_position.1 + delta_y);
+        let new_idx = xy_idx(self.width, new_position.0, new_position.1);
+        if self.map[new_idx] == TileType::Floor {
+            self.player_position = new_idx;
         }
-        let idx = (y * self.width) + x;
-        self.map[idx as usize] == TileType::Floor
     }
 
     fn tick(&mut self, ctx: &mut BTerm, runstate: &RunState) -> RunState {
@@ -148,67 +149,26 @@ impl DemoState {
                 y += 1;
             }
         }
-        if INPUT.lock().is_key_pressed(VirtualKeyCode::R) {
-            self.recreate_map();
-        }
-        if INPUT.lock().is_key_pressed(VirtualKeyCode::Escape) {
-            self.mode = Mode::Exiting;
-        }
 
-        // Either render the proposed path or run along it
-        if self.mode == Mode::Waiting {
-            // Render a mouse cursor
-            let mouse_pos = INPUT.lock().mouse_tile(0);
-            let mouse_idx = self.point2d_to_index(mouse_pos);
-            draw_batch.print_color(
-                mouse_pos,
-                "X",
-                ColorPair::new(RGB::from_f32(0.0, 1.0, 1.0), RGB::from_f32(0.0, 1.0, 1.0)),
-            );
-            if self.map[mouse_idx as usize] != TileType::Wall {
-                let path = a_star_search(self.player_position, mouse_idx, self);
-                if path.success {
-                    for loc in path.steps.iter().skip(1) {
-                        let x = (loc % self.width as usize) as i32;
-                        let y = (loc / self.width as usize) as i32;
-                        draw_batch.print_color(
-                            Point::new(x, y),
-                            "*",
-                            ColorPair::new(RGB::from_f32(1., 0., 0.), RGB::from_f32(0., 0., 0.)),
-                        );
-                    }
+        match ctx.key {
+            None => {}
+            Some(key) => {
 
-                    if INPUT.lock().is_mouse_button_pressed(0) {
-                        self.mode = Mode::Moving;
-                        self.path = path;
-                    }
+                match key {
+                    VirtualKeyCode::R => self.recreate_map(),
+                    VirtualKeyCode::Escape => self.mode = Mode::Exiting,
+
+                    // Cursors
+                    VirtualKeyCode::Up => self.move_player(0, -1),
+                    VirtualKeyCode::Down => self.move_player(0, 1),
+                    VirtualKeyCode::Left => self.move_player(-1, 0),
+                    VirtualKeyCode::Right => self.move_player(1, 0),
+
+                    _ => {} // Ignore all the other possibilities
                 }
             }
-        } else if self.mode == Mode::Moving {
-            let mut step = self.path.steps[0] as usize;
-            self.path.steps.remove(0);
-            if ! self.is_exit_valid((step % self.width as usize) as i32, (step / self.width as usize) as i32) {
-              let goal = self.path.destination;
-              let path = a_star_search(self.player_position, goal, self);
-              if path.steps.len() == 0 {
-                self.mode = Mode::Waiting;
-              }
-              else {
-                step = path.steps[0] as usize;
-                self.path = path;
-              }
-            }
-            self.player_position = step;
-            if self.path.steps.is_empty() {
-                self.mode = Mode::Waiting;
-            }
-        } else if self.mode == Mode::Exiting {
-            newrunstate = RunState::DemoMenu {
-                menu_selection: gui::DemoMenuSelection::AStarPathfindingDemo,
-            };
         }
 
-        // Render the player @ symbol
         let ppos = idx_xy(self.width.try_into().unwrap(), self.player_position);
         draw_batch.print_color(
             Point::from_tuple(ppos),
@@ -216,9 +176,14 @@ impl DemoState {
             ColorPair::new(RGB::from_f32(1.0, 1.0, 0.0), RGB::from_f32(0., 0., 0.)),
         );
 
-        // Submit the rendering
         draw_batch.submit(0).expect("Batch error");
         render_draw_buffer(ctx).expect("Render error");
+
+        if self.mode == Mode::Exiting {
+            newrunstate = RunState::DemoMenu {
+                menu_selection: gui::DemoMenuSelection::WalkingAroundDemo,
+            };
+        }
 
         newrunstate
     }
@@ -229,47 +194,6 @@ impl BaseMap for DemoState {
         self.map[idx] == TileType::Wall
     }
 
-    fn get_available_exits(&self, idx: usize) -> SmallVec<[(usize, f32); 10]> {
-        let mut exits = SmallVec::new();
-        let x = (idx % self.width as usize) as i32;
-        let y = (idx / self.width as usize) as i32;
-
-        // Cardinal directions
-        if self.is_exit_valid(x - 1, y) {
-            exits.push((idx - 1, 1.0))
-        };
-        if self.is_exit_valid(x + 1, y) {
-            exits.push((idx + 1, 1.0))
-        };
-        if self.is_exit_valid(x, y - 1) {
-            exits.push((idx - self.width as usize, 1.0))
-        };
-        if self.is_exit_valid(x, y + 1) {
-            exits.push((idx + self.width as usize, 1.0))
-        };
-
-        // Diagonals
-        if self.is_exit_valid(x - 1, y - 1) {
-            exits.push(((idx - self.width as usize) - 1, 1.4));
-        }
-        if self.is_exit_valid(x + 1, y - 1) {
-            exits.push(((idx - self.width as usize) + 1, 1.4));
-        }
-        if self.is_exit_valid(x - 1, y + 1) {
-            exits.push(((idx + self.width as usize) - 1, 1.4));
-        }
-        if self.is_exit_valid(x + 1, y + 1) {
-            exits.push(((idx + self.width as usize) + 1, 1.4));
-        }
-
-        exits
-    }
-
-    fn get_pathing_distance(&self, idx1: usize, idx2: usize) -> f32 {
-        let p1 = Point::new(idx1 % self.width as usize, idx1 / self.width as usize);
-        let p2 = Point::new(idx2 % self.width as usize, idx2 / self.width as usize);
-        DistanceAlg::Pythagoras.distance2d(p1, p2)
-    }
 }
 
 impl Algorithm2D for DemoState {
@@ -287,7 +211,7 @@ pub fn tick(ctx: &mut Rltk, runstate: &RunState) -> RunState {
     let mut newrunstate = *runstate;
     match runstate {
         RunState::Demo { demo } => match demo {
-            Demo::AStarPathfinding => {
+            Demo::WalkingAround => {
                 if DEMO_STATE.lock().unwrap().mode == Mode::Exiting {
                     DEMO_STATE.lock().unwrap().mode = Mode::Waiting;
                     DEMO_STATE.lock().unwrap().recreate_map();
