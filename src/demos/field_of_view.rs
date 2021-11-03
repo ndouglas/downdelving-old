@@ -9,7 +9,7 @@ use map::{tile_glyph, TileType};
 use rltk::prelude::field_of_view as bracket_fov;
 use rltk::prelude::*;
 use rltk::NavigationPath;
-use std::fmt::{self, Debug, Display};
+use std::fmt::{self, Debug};
 use std::sync::Mutex;
 
 #[derive(PartialEq, Copy, Clone)]
@@ -63,7 +63,6 @@ impl DemoState {
             .as_mut()
             .unwrap()
             .clone();
-        let length = width * height;
         let mut state = DemoState {
             map: builder.build_data.map,
             player_position: xy_idx(width, position.x, position.y),
@@ -99,12 +98,14 @@ impl DemoState {
     }
 
     pub fn move_player(&mut self, delta_x: i32, delta_y: i32) {
+        self.mode = Mode::Moving;
         let current_position = idx_xy(self.width.try_into().unwrap(), self.player_position);
         let new_position = (current_position.0 + delta_x, current_position.1 + delta_y);
         let new_idx = xy_idx(self.width, new_position.0, new_position.1);
         if self.map.tiles[new_idx] == TileType::Floor {
             self.player_position = new_idx;
         }
+        self.mode = Mode::Waiting;
     }
 
     fn tick(&mut self, ctx: &mut BTerm, runstate: &RunState) -> RunState {
@@ -120,7 +121,7 @@ impl DemoState {
 
         // Obtain the player's visible tile set, and apply it
         let player_position = self.index_to_point2d(self.player_position);
-        let mut fov = match self.fov_algorithm {
+        let fov = match self.fov_algorithm {
             FovAlgorithm::Bracket => bracket_fov(player_position, 8, self),
             FovAlgorithm::Shadowcasting => {
                 shadowcasting_fov(player_position.x, player_position.y, 8, &self.map)
@@ -136,7 +137,7 @@ impl DemoState {
         draw_batch.cls();
 
         // Iterate the map array, incrementing coordinates as we go.
-        for (i, tile) in self.map.tiles.iter().enumerate() {
+        for (i, _tile) in self.map.tiles.iter().enumerate() {
             let xy = idx_xy(self.width as usize, i);
             if xy.1 == 0 {
                 continue;

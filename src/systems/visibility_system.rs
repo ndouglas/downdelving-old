@@ -1,6 +1,5 @@
 use crate::perception::field_of_view::field_of_view;
 use crate::{BlocksVisibility, Hidden, Map, Name, Player, Position, Viewshed};
-use rltk::Point;
 use specs::prelude::*;
 
 pub struct VisibilitySystem {}

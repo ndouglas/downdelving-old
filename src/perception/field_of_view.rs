@@ -1,5 +1,5 @@
 use crate::map::Map;
-use rltk::{BaseMap, Point};
+use rltk::BaseMap;
 
 /// Recursive Symmetric Shadowcasting
 ///

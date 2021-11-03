@@ -85,12 +85,14 @@ impl DemoState {
     }
 
     pub fn move_player(&mut self, delta_x: i32, delta_y: i32) {
+        self.mode = Mode::Moving;
         let current_position = idx_xy(self.width.try_into().unwrap(), self.player_position);
         let new_position = (current_position.0 + delta_x, current_position.1 + delta_y);
         let new_idx = xy_idx(self.width, new_position.0, new_position.1);
         if self.map[new_idx] == TileType::Floor {
             self.player_position = new_idx;
         }
+        self.mode = Mode::Waiting;
     }
 
     fn tick(&mut self, ctx: &mut BTerm, runstate: &RunState) -> RunState {
