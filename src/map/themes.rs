@@ -202,7 +202,7 @@ fn get_limestone_cavern_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB
     (glyph, fg, bg)
 }
 
-fn get_tile_glyph_default(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
+pub fn get_tile_glyph_default(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
     let glyph;
     let fg;
     let bg = RGB::from_f32(0., 0., 0.);

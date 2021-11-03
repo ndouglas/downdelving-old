@@ -5,6 +5,7 @@ use rltk::prelude::*;
 pub enum DemoMenuSelection {
     AStarPathfindingDemo,
     WalkingAroundDemo,
+    FieldOfViewDemo,
     Exit,
 }
 
@@ -25,7 +26,7 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
     let white_on_black = ColorPair::new(RGB::named(rltk::WHITE), black);
     ctx.render_xp_sprite(&assets.menu, 0, 0);
 
-    draw_batch.draw_double_box(Rect::with_size(24, 18, 31, 10), wheat_on_black);
+    draw_batch.draw_double_box(Rect::with_size(24, 18, 31, 12), wheat_on_black);
 
     draw_batch.print_color_centered(20, "Demos", yellow_on_black);
 
@@ -49,6 +50,16 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
             y,
             "Walking Around",
             if selection == DemoMenuSelection::WalkingAroundDemo {
+                magenta_on_black
+            } else {
+                white_on_black
+            },
+        );
+        y += 1;
+        draw_batch.print_color_centered(
+            y,
+            "Field of View",
+            if selection == DemoMenuSelection::FieldOfViewDemo {
                 magenta_on_black
             } else {
                 white_on_black
@@ -90,8 +101,11 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                         DemoMenuSelection::WalkingAroundDemo => {
                             newselection = DemoMenuSelection::AStarPathfindingDemo
                         }
-                        DemoMenuSelection::Exit => {
+                        DemoMenuSelection::FieldOfViewDemo => {
                             newselection = DemoMenuSelection::WalkingAroundDemo
+                        }
+                        DemoMenuSelection::Exit => {
+                            newselection = DemoMenuSelection::FieldOfViewDemo
                         }
                     }
                     return DemoMenuResult::NoSelection {
@@ -105,6 +119,9 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                             newselection = DemoMenuSelection::WalkingAroundDemo
                         }
                         DemoMenuSelection::WalkingAroundDemo => {
+                            newselection = DemoMenuSelection::FieldOfViewDemo
+                        }
+                        DemoMenuSelection::FieldOfViewDemo => {
                             newselection = DemoMenuSelection::Exit
                         }
                         DemoMenuSelection::Exit => {

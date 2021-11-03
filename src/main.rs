@@ -22,6 +22,7 @@ mod gui;
 pub mod main_game;
 pub use main_game::MainGameRunState;
 pub mod map_builders;
+pub mod perception;
 pub mod random_table;
 pub mod raws;
 pub mod rex_assets;
@@ -33,6 +34,8 @@ pub mod rng;
 pub mod spatial;
 mod systems;
 pub mod vendor;
+use rex_assets::RexAssets;
+use systems::particle_system::ParticleBuilder;
 
 const SHOW_MAPGEN_VISUALIZER: bool = false;
 const SHOW_FPS: bool = true;
@@ -204,9 +207,8 @@ fn main() -> rltk::BError {
     gs.ecs.insert(RunState::MainGame {
         runstate: MainGameRunState::MapGeneration {},
     });
-    gs.ecs
-        .insert(systems::particle_system::ParticleBuilder::new());
-    gs.ecs.insert(rex_assets::RexAssets::new());
+    gs.ecs.insert(ParticleBuilder::new());
+    gs.ecs.insert(RexAssets::new());
 
     rltk::main_loop(context, gs)
 }

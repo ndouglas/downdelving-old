@@ -187,16 +187,18 @@ impl DemoState {
         } else if self.mode == Mode::Moving {
             let mut step = self.path.steps[0] as usize;
             self.path.steps.remove(0);
-            if ! self.is_exit_valid((step % self.width as usize) as i32, (step / self.width as usize) as i32) {
-              let goal = self.path.destination;
-              let path = a_star_search(self.player_position, goal, self);
-              if path.steps.len() == 0 {
-                self.mode = Mode::Waiting;
-              }
-              else {
-                step = path.steps[0] as usize;
-                self.path = path;
-              }
+            if !self.is_exit_valid(
+                (step % self.width as usize) as i32,
+                (step / self.width as usize) as i32,
+            ) {
+                let goal = self.path.destination;
+                let path = a_star_search(self.player_position, goal, self);
+                if path.steps.len() == 0 {
+                    self.mode = Mode::Waiting;
+                } else {
+                    step = path.steps[0] as usize;
+                    self.path = path;
+                }
             }
             self.player_position = step;
             if self.path.steps.is_empty() {
@@ -293,7 +295,7 @@ pub fn tick(ctx: &mut Rltk, runstate: &RunState) -> RunState {
                     DEMO_STATE.lock().unwrap().recreate_map();
                 }
                 newrunstate = DEMO_STATE.lock().unwrap().tick(ctx, runstate);
-            },
+            }
             _ => {}
         },
         _ => {}

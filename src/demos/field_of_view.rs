@@ -1,16 +1,16 @@
 use crate::demos::Demo;
 use crate::gui;
+use crate::map;
+use crate::map_builders::level_builder;
+use crate::perception::field_of_view::field_of_view as shadowcasting_fov;
 use crate::RunState;
 use derivative::Derivative;
+use map::{tile_glyph, TileType};
+use rltk::prelude::field_of_view as bracket_fov;
 use rltk::prelude::*;
 use rltk::NavigationPath;
+use std::fmt::{self, Debug, Display};
 use std::sync::Mutex;
-
-#[derive(PartialEq, Copy, Clone)]
-enum TileType {
-    Wall,
-    Floor,
-}
 
 #[derive(PartialEq, Copy, Clone)]
 enum Mode {
@@ -19,19 +19,30 @@ enum Mode {
     Exiting,
 }
 
+#[derive(PartialEq, Copy, Clone, Debug)]
+enum FovAlgorithm {
+    Bracket,
+    Shadowcasting,
+}
+
+impl fmt::Display for FovAlgorithm {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        Debug::fmt(self, f)
+    }
+}
+
 #[derive(Derivative)]
 #[derivative(PartialEq, Clone)]
 pub struct DemoState {
     #[derivative(PartialEq = "ignore")]
-    map: Vec<TileType>,
+    map: map::Map,
     player_position: usize,
-    #[derivative(PartialEq = "ignore")]
-    visible: Vec<bool>,
     mode: Mode,
     #[derivative(PartialEq = "ignore")]
     path: NavigationPath,
     width: i32,
     height: i32,
+    fov_algorithm: FovAlgorithm,
 }
 
 pub fn xy_idx(width: i32, x: i32, y: i32) -> usize {
@@ -44,15 +55,23 @@ pub fn idx_xy(width: usize, idx: usize) -> (i32, i32) {
 
 impl DemoState {
     pub fn new(width: i32, height: i32) -> DemoState {
+        let mut builder = level_builder(47, width, height);
+        builder.build_map();
+        let position = builder
+            .build_data
+            .starting_position
+            .as_mut()
+            .unwrap()
+            .clone();
         let length = width * height;
         let mut state = DemoState {
-            map: vec![TileType::Floor; length.try_into().unwrap()],
-            player_position: xy_idx(width as i32, width as i32 / 2, height as i32 / 2),
-            visible: vec![false; length.try_into().unwrap()],
+            map: builder.build_data.map,
+            player_position: xy_idx(width, position.x, position.y),
             mode: Mode::Waiting,
             path: NavigationPath::new(),
             width: width,
             height: height,
+            fov_algorithm: FovAlgorithm::Bracket,
         };
         state.recreate_map();
 
@@ -60,27 +79,22 @@ impl DemoState {
     }
 
     pub fn recreate_map(&mut self) {
-        let length = self.width * self.height;
-        self.map = vec![TileType::Floor; length.try_into().unwrap()];
+        let mut builder = level_builder(47, self.width, self.height);
+        builder.build_map();
+        self.map = builder.build_data.map;
+        let position = builder
+            .build_data
+            .starting_position
+            .as_mut()
+            .unwrap()
+            .clone();
+        self.player_position = xy_idx(self.width, position.x, position.y);
+    }
 
-        for x in 0..self.width {
-            self.map[xy_idx(self.width, x, 0)] = TileType::Wall;
-            self.map[xy_idx(self.width, x, self.height - 1)] = TileType::Wall;
-        }
-        for y in 0..self.height {
-            self.map[xy_idx(self.width, 0, y)] = TileType::Wall;
-            self.map[xy_idx(self.width, self.width - 1, y)] = TileType::Wall;
-        }
-
-        let mut rng = RandomNumberGenerator::new();
-
-        for _ in 0..length / 2 {
-            let x = rng.range(1, self.width - 1);
-            let y = rng.range(1, self.height - 1);
-            let idx = xy_idx(self.width, x, y);
-            if self.player_position != idx {
-                self.map[idx] = TileType::Wall;
-            }
+    pub fn switch_fov_algorithm(&mut self) {
+        self.fov_algorithm = match self.fov_algorithm {
+            FovAlgorithm::Bracket => FovAlgorithm::Shadowcasting,
+            FovAlgorithm::Shadowcasting => FovAlgorithm::Bracket,
         }
     }
 
@@ -88,7 +102,7 @@ impl DemoState {
         let current_position = idx_xy(self.width.try_into().unwrap(), self.player_position);
         let new_position = (current_position.0 + delta_x, current_position.1 + delta_y);
         let new_idx = xy_idx(self.width, new_position.0, new_position.1);
-        if self.map[new_idx] == TileType::Floor {
+        if self.map.tiles[new_idx] == TileType::Floor {
             self.player_position = new_idx;
         }
     }
@@ -100,54 +114,39 @@ impl DemoState {
         let mut draw_batch = DrawBatch::new();
 
         // Set all tiles to not visible
-        for v in &mut self.visible {
+        for v in &mut self.map.visible_tiles {
             *v = false;
         }
 
         // Obtain the player's visible tile set, and apply it
         let player_position = self.index_to_point2d(self.player_position);
-        let fov = field_of_view_set(player_position, 8, self);
+        let mut fov = match self.fov_algorithm {
+            FovAlgorithm::Bracket => bracket_fov(player_position, 8, self),
+            FovAlgorithm::Shadowcasting => {
+                shadowcasting_fov(player_position.x, player_position.y, 8, &self.map)
+            }
+        };
 
         // Note that the steps above would generally not be run every frame!
         for idx in &fov {
-            self.visible[xy_idx(self.width, idx.x, idx.y)] = true;
+            self.map.visible_tiles[xy_idx(self.width, idx.x, idx.y)] = true;
         }
 
         // Clear the screen
         draw_batch.cls();
 
         // Iterate the map array, incrementing coordinates as we go.
-        let mut y = 0;
-        let mut x = 0;
-        for (i, tile) in self.map.iter().enumerate() {
-            // Render a tile depending upon the tile type; now we check visibility as well!
-            let mut fg;
-            let mut glyph = ".";
-
-            match tile {
-                TileType::Floor => {
-                    fg = RGB::from_f32(0.5, 0.5, 0.0);
-                }
-                TileType::Wall => {
-                    fg = RGB::from_f32(0.0, 1.0, 0.0);
-                    glyph = "#";
-                }
+        for (i, tile) in self.map.tiles.iter().enumerate() {
+            let xy = idx_xy(self.width as usize, i);
+            if xy.1 == 0 {
+                continue;
             }
-            if !self.visible[i] {
+            let glyph = tile_glyph(i, &self.map);
+            let mut fg = glyph.1;
+            if !self.map.visible_tiles[i] {
                 fg = fg.to_greyscale();
             }
-            draw_batch.print_color(
-                Point::new(x, y),
-                glyph,
-                ColorPair::new(fg, RGB::from_f32(0., 0., 0.)),
-            );
-
-            // Move the coordinates
-            x += 1;
-            if x > self.width - 1 {
-                x = 0;
-                y += 1;
-            }
+            draw_batch.set(Point::new(xy.0, xy.1), ColorPair::new(fg, glyph.2), glyph.0);
         }
 
         match ctx.key {
@@ -155,6 +154,7 @@ impl DemoState {
             Some(key) => {
                 match key {
                     VirtualKeyCode::R => self.recreate_map(),
+                    VirtualKeyCode::F => self.switch_fov_algorithm(),
                     VirtualKeyCode::Escape => self.mode = Mode::Exiting,
 
                     // Cursors
@@ -177,10 +177,15 @@ impl DemoState {
 
         draw_batch.submit(0).expect("Batch error");
         render_draw_buffer(ctx).expect("Render error");
+        ctx.print(
+            1,
+            0,
+            &format!("[F] FOV Algorithm {}", self.fov_algorithm.to_string()),
+        );
 
         if self.mode == Mode::Exiting {
             newrunstate = RunState::DemoMenu {
-                menu_selection: gui::DemoMenuSelection::WalkingAroundDemo,
+                menu_selection: gui::DemoMenuSelection::FieldOfViewDemo,
             };
         }
 
@@ -190,7 +195,7 @@ impl DemoState {
 
 impl BaseMap for DemoState {
     fn is_opaque(&self, idx: usize) -> bool {
-        self.map[idx] == TileType::Wall
+        self.map.tiles[idx] == TileType::Wall
     }
 }
 
@@ -209,7 +214,7 @@ pub fn tick(ctx: &mut Rltk, runstate: &RunState) -> RunState {
     let mut newrunstate = *runstate;
     match runstate {
         RunState::Demo { demo } => match demo {
-            Demo::WalkingAround => {
+            Demo::FieldOfView => {
                 if DEMO_STATE.lock().unwrap().mode == Mode::Exiting {
                     DEMO_STATE.lock().unwrap().mode = Mode::Waiting;
                     DEMO_STATE.lock().unwrap().recreate_map();

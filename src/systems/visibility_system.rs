@@ -1,5 +1,6 @@
+use crate::perception::field_of_view::field_of_view;
 use crate::{BlocksVisibility, Hidden, Map, Name, Player, Position, Viewshed};
-use rltk::{field_of_view, Point};
+use rltk::Point;
 use specs::prelude::*;
 
 pub struct VisibilitySystem {}
@@ -31,7 +32,7 @@ impl<'a> System<'a> for VisibilitySystem {
             if viewshed.dirty {
                 viewshed.dirty = false;
                 viewshed.visible_tiles =
-                    field_of_view(Point::new(pos.x, pos.y), viewshed.range, &*map);
+                    field_of_view(pos.x, pos.y, viewshed.range, &*map);
                 viewshed
                     .visible_tiles
                     .retain(|p| p.x >= 0 && p.x < map.width && p.y >= 0 && p.y < map.height);

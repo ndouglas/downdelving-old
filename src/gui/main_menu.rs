@@ -29,7 +29,7 @@ pub fn main_menu(gs: &mut State, ctx: &mut Rltk) -> MainMenuResult {
     let white_on_black = ColorPair::new(RGB::named(rltk::WHITE), black);
     ctx.render_xp_sprite(&assets.menu, 0, 0);
 
-    draw_batch.draw_double_box(Rect::with_size(24, 18, 31, 10), wheat_on_black);
+    draw_batch.draw_double_box(Rect::with_size(24, 18, 31, 11), wheat_on_black);
 
     draw_batch.print_color_centered(20, "Downdelving", yellow_on_black);
     draw_batch.print_color_centered(21, "by Nathan Douglas", cyan_on_black);
