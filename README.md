@@ -13,7 +13,7 @@ I have some goals/aims I hope to achieve with this game that may make it somewha
 
 **Interesting and original behavior by each creature in the game, reflecting how environmental, historic, cultural, and other pressures have shaped the creature's species, local culture (if any), and the creature as an individual**
 
-I had a powerful experience in the midst of one of the best games I've ever played -- _After the Plague II_, a Hungarian MUD -- where a goblin village had many scripted (but well-scripted) interactions between the goblins -- showing interactions between different classes, genders, ages, etc.  They would speak to each other, they would pick up objects, they would irritate each other, they would fight, and so forth.
+I had a powerful experience in the midst of one of the best games I've ever played -- _After the Plague II_, a Hungarian MUD -- where a goblin village had many scripted (but _well_-scripted) interactions between the goblins -- showing interactions between different classes, genders, ages, etc.  They would speak to each other, they would pick up objects, they would irritate each other, they would fight, and so forth.
 
 It was scripted, of course, and if you killed the goblins they'd respawn a few moments later... but the experience of discovering this village has stuck with me.  And the thought that maybe I could expand on this, and make these interactions more dynamic and more interesting.
 
