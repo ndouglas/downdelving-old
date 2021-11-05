@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 mod events;
 pub use events::*;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LogFragment {
     pub color: RGB,
     pub text: String,

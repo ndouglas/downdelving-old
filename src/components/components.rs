@@ -6,26 +6,26 @@ use specs::saveload::{ConvertSaveload, Marker};
 use specs_derive::*;
 use std::collections::HashMap;
 
-#[derive(Component, ConvertSaveload, Clone)]
+#[derive(Component, ConvertSaveload, Clone, Debug)]
 pub struct Position {
     pub x: i32,
     pub y: i32,
 }
 
-#[derive(Component, ConvertSaveload, Clone)]
+#[derive(Component, ConvertSaveload, Clone, Debug)]
 pub struct TileSize {
     pub x: i32,
     pub y: i32,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct OtherLevelPosition {
     pub x: i32,
     pub y: i32,
     pub depth: i32,
 }
 
-#[derive(Component, ConvertSaveload, Clone)]
+#[derive(Component, ConvertSaveload, Clone, Debug)]
 pub struct Renderable {
     pub glyph: rltk::FontCharType,
     pub fg: RGB,
@@ -76,14 +76,14 @@ pub struct SpellTemplate {
     pub mana_cost: i32,
 }
 
-#[derive(Component, ConvertSaveload, Clone)]
+#[derive(Component, ConvertSaveload, Clone, Debug)]
 pub struct Viewshed {
     pub visible_tiles: Vec<rltk::Point>,
     pub range: i32,
     pub dirty: bool,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct LightSource {
     pub color: RGB,
     pub range: i32,
@@ -363,7 +363,7 @@ pub struct WantsToRemoveItem {
     pub item: Entity,
 }
 
-#[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum EquipmentSlot {
     Melee,
     Shield,
@@ -374,24 +374,24 @@ pub enum EquipmentSlot {
     Hands,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct Equippable {
     pub slot: EquipmentSlot,
 }
 
-#[derive(Component, ConvertSaveload, Clone)]
+#[derive(Component, ConvertSaveload, Clone, Debug)]
 pub struct Equipped {
     pub owner: Entity,
     pub slot: EquipmentSlot,
 }
 
-#[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum WeaponAttribute {
     Might,
     Quickness,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct Weapon {
     pub range: Option<i32>,
     pub attribute: WeaponAttribute,
@@ -403,13 +403,13 @@ pub struct Weapon {
     pub proc_target: Option<String>,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct Wearable {
     pub armor_class: f32,
     pub slot: EquipmentSlot,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct NaturalAttack {
     pub name: String,
     pub damage_n_dice: i32,
@@ -418,13 +418,13 @@ pub struct NaturalAttack {
     pub hit_bonus: i32,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct NaturalAttackDefense {
     pub armor_class: Option<i32>,
     pub attacks: Vec<NaturalAttack>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ParticleAnimation {
     pub step_time: f32,
     pub path: Vec<Point>,
@@ -432,33 +432,33 @@ pub struct ParticleAnimation {
     pub timer: f32,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct ParticleLifetime {
     pub lifetime_ms: f32,
     pub animation: Option<ParticleAnimation>,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct SpawnParticleLine {
     pub glyph: rltk::FontCharType,
     pub color: RGB,
     pub lifetime_ms: f32,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct SpawnParticleBurst {
     pub glyph: rltk::FontCharType,
     pub color: RGB,
     pub lifetime_ms: f32,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct Bleeds {
     pub bleeds: bool,
     pub color: RGB,
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Copy, Clone, PartialEq, Debug)]
 pub enum HungerState {
     WellFed,
     Normal,
@@ -466,7 +466,7 @@ pub enum HungerState {
     Starving,
 }
 
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct HungerClock {
     pub state: HungerState,
     pub duration: i32,
@@ -512,11 +512,11 @@ pub struct Quips {
 pub struct SerializeMe;
 
 // Special component that exists to help serialize the game data
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct SerializationHelper {
     pub map: crate::map::Map,
 }
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug)]
 pub struct DMSerializationHelper {
     pub map: crate::map::MasterDungeonMap,
     pub log: Vec<Vec<crate::gamelog::LogFragment>>,

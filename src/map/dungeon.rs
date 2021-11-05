@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use specs::prelude::*;
 use std::collections::{HashMap, HashSet};
 
-#[derive(Default, Serialize, Deserialize, Clone)]
+#[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct MasterDungeonMap {
     maps: HashMap<i32, Map>,
     pub identified_items: HashSet<String>,

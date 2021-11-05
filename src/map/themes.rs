@@ -1,30 +1,30 @@
 use super::{Map, TileType};
 use rltk::RGB;
 
-pub fn tile_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
+pub fn get_tile_renderable(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
     let (glyph, mut fg, mut bg) = match map.depth {
-        9 => get_mushroom_glyph(idx, map),
-        8 => get_mushroom_glyph(idx, map),
+        9 => get_mushroom_tile_renderable(idx, map),
+        8 => get_mushroom_tile_renderable(idx, map),
         7 => {
             let x = idx as i32 % map.width;
             if x > map.width - 16 {
-                get_tile_glyph_default(idx, map)
+                get_default_tile_renderable(idx, map)
             } else {
-                get_mushroom_glyph(idx, map)
+                get_mushroom_tile_renderable(idx, map)
             }
         }
         5 => {
             let x = idx as i32 % map.width;
             if x < map.width / 2 {
-                get_limestone_cavern_glyph(idx, map)
+                get_limestone_cavern_tile_renderable(idx, map)
             } else {
-                get_tile_glyph_default(idx, map)
+                get_default_tile_renderable(idx, map)
             }
         }
-        4 => get_limestone_cavern_glyph(idx, map),
-        3 => get_limestone_cavern_glyph(idx, map),
-        2 => get_forest_glyph(idx, map),
-        _ => get_tile_glyph_default(idx, map),
+        4 => get_limestone_cavern_tile_renderable(idx, map),
+        3 => get_limestone_cavern_tile_renderable(idx, map),
+        2 => get_forest_tile_renderable(idx, map),
+        _ => get_default_tile_renderable(idx, map),
     };
 
     if map.bloodstains.contains_key(&idx) {
@@ -41,7 +41,7 @@ pub fn tile_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
     (glyph, fg, bg)
 }
 
-fn get_forest_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
+fn get_forest_tile_renderable(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
     let glyph;
     let fg;
     let bg = RGB::from_f32(0., 0., 0.);
@@ -92,7 +92,7 @@ fn get_forest_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
     (glyph, fg, bg)
 }
 
-fn get_mushroom_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
+fn get_mushroom_tile_renderable(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
     let glyph;
     let fg;
     let bg = RGB::from_f32(0., 0., 0.);
@@ -143,7 +143,7 @@ fn get_mushroom_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
     (glyph, fg, bg)
 }
 
-fn get_limestone_cavern_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
+fn get_limestone_cavern_tile_renderable(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
     let glyph;
     let fg;
     let bg = RGB::from_f32(0., 0., 0.);
@@ -202,7 +202,7 @@ fn get_limestone_cavern_glyph(idx: usize, map: &Map) -> (rltk::FontCharType, RGB
     (glyph, fg, bg)
 }
 
-pub fn get_tile_glyph_default(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
+pub fn get_default_tile_renderable(idx: usize, map: &Map) -> (rltk::FontCharType, RGB, RGB) {
     let glyph;
     let fg;
     let bg = RGB::from_f32(0., 0., 0.);

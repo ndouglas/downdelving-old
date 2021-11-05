@@ -5,7 +5,7 @@ use crate::map_builders::level_builder;
 use crate::perception::field_of_view::field_of_view as shadowcasting_fov;
 use crate::RunState;
 use derivative::Derivative;
-use map::{tile_glyph, TileType};
+use map::{get_tile_renderable, TileType};
 use rltk::prelude::field_of_view as bracket_fov;
 use rltk::prelude::*;
 use rltk::NavigationPath;
@@ -142,7 +142,7 @@ impl DemoState {
             if xy.1 == 0 {
                 continue;
             }
-            let glyph = tile_glyph(i, &self.map);
+            let glyph = get_tile_renderable(i, &self.map);
             let mut fg = glyph.1;
             if !self.map.visible_tiles[i] {
                 fg = fg.to_greyscale();
