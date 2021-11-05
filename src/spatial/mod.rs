@@ -1,4 +1,4 @@
-use crate::{tile_walkable, MainGameRunState, Map, RunState};
+use crate::{MainGameRunState, Map, RunState};
 use specs::prelude::*;
 use std::sync::Mutex;
 
@@ -40,7 +40,7 @@ pub fn clear() {
 pub fn populate_blocked_from_map(map: &Map) {
     let mut lock = SPATIAL_MAP.lock().unwrap();
     for (i, tile) in map.tiles.iter().enumerate() {
-        lock.blocked[i].0 = !tile_walkable(*tile);
+        lock.blocked[i].0 = !tile.is_walkable();
     }
 }
 

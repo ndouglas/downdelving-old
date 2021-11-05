@@ -12,7 +12,6 @@ pub fn dwarf_fortress_builder(new_depth: i32, width: i32, height: i32) -> Builde
     chain.with(BspCorridors::new());
     chain.with(CorridorSpawner::new());
     chain.with(DragonsLair::new());
-
     chain.with(AreaStartingPosition::new(XStart::LEFT, YStart::TOP));
     chain.with(CullUnreachable::new());
     chain.with(AreaEndingPosition::new(XEnd::RIGHT, YEnd::BOTTOM));

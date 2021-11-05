@@ -2,7 +2,7 @@ use rltk::{Algorithm2D, BaseMap, Point};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 mod tiletype;
-pub use tiletype::{tile_cost, tile_opaque, tile_walkable, TileType};
+pub use tiletype::TileType;
 mod themes;
 pub use themes::*;
 mod dungeon;
@@ -93,7 +93,7 @@ impl Map {
 impl BaseMap for Map {
     fn is_opaque(&self, idx: usize) -> bool {
         if idx > 0 && idx < self.tiles.len() {
-            tile_opaque(self.tiles[idx]) || self.view_blocked.contains(&idx)
+            self.tiles[idx].is_opaque() || self.view_blocked.contains(&idx)
         } else {
             true
         }
@@ -109,30 +109,30 @@ impl BaseMap for Map {
 
         // Cardinal directions
         if self.is_exit_valid(x - 1, y) {
-            exits.push((idx - 1, tile_cost(tt)))
+            exits.push((idx - 1, tt.cost()))
         };
         if self.is_exit_valid(x + 1, y) {
-            exits.push((idx + 1, tile_cost(tt)))
+            exits.push((idx + 1, tt.cost()))
         };
         if self.is_exit_valid(x, y - 1) {
-            exits.push((idx - w, tile_cost(tt)))
+            exits.push((idx - w, tt.cost()))
         };
         if self.is_exit_valid(x, y + 1) {
-            exits.push((idx + w, tile_cost(tt)))
+            exits.push((idx + w, tt.cost()))
         };
 
         // Diagonals
         if self.is_exit_valid(x - 1, y - 1) {
-            exits.push(((idx - w) - 1, tile_cost(tt) * DIAGONAL_COST));
+            exits.push(((idx - w) - 1, tt.cost() * DIAGONAL_COST));
         }
         if self.is_exit_valid(x + 1, y - 1) {
-            exits.push(((idx - w) + 1, tile_cost(tt) * DIAGONAL_COST));
+            exits.push(((idx - w) + 1, tt.cost() * DIAGONAL_COST));
         }
         if self.is_exit_valid(x - 1, y + 1) {
-            exits.push(((idx + w) - 1, tile_cost(tt) * DIAGONAL_COST));
+            exits.push(((idx + w) - 1, tt.cost() * DIAGONAL_COST));
         }
         if self.is_exit_valid(x + 1, y + 1) {
-            exits.push(((idx + w) + 1, tile_cost(tt) * DIAGONAL_COST));
+            exits.push(((idx + w) + 1, tt.cost() * DIAGONAL_COST));
         }
 
         exits

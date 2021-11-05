@@ -1,5 +1,4 @@
 use super::{BuilderMap, MetaMapBuilder, TileType};
-use crate::map;
 
 #[allow(dead_code)]
 pub enum XEnd {
@@ -50,7 +49,7 @@ impl AreaEndingPosition {
 
         let mut available_floors: Vec<(usize, f32)> = Vec::new();
         for (idx, tiletype) in build_data.map.tiles.iter().enumerate() {
-            if map::tile_walkable(*tiletype) {
+            if tiletype.is_walkable() {
                 available_floors.push((
                     idx,
                     rltk::DistanceAlg::PythagorasSquared.distance2d(

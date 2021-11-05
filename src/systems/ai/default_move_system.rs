@@ -1,4 +1,4 @@
-use crate::{map::tile_walkable, ApplyMove, Map, MoveMode, Movement, MyTurn, Position};
+use crate::{ApplyMove, Map, MoveMode, Movement, MyTurn, Position};
 use specs::prelude::*;
 
 pub struct DefaultMoveAI {}
@@ -68,7 +68,7 @@ impl<'a> System<'a> for DefaultMoveAI {
                         let target_x = crate::rng::roll_dice(1, map.width - 2);
                         let target_y = crate::rng::roll_dice(1, map.height - 2);
                         let idx = map.xy_idx(target_x, target_y);
-                        if tile_walkable(map.tiles[idx]) {
+                        if map.tiles[idx].is_walkable() {
                             let path = rltk::a_star_search(
                                 map.xy_idx(pos.x, pos.y),
                                 map.xy_idx(target_x, target_y),

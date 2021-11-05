@@ -58,7 +58,7 @@ impl DragonSpawner {
         let seed_y = build_data.map.height / 2;
         let mut available_floors: Vec<(usize, f32)> = Vec::new();
         for (idx, tiletype) in build_data.map.tiles.iter().enumerate() {
-            if crate::map::tile_walkable(*tiletype) {
+            if tiletype.is_walkable() {
                 available_floors.push((
                     idx,
                     rltk::DistanceAlg::PythagorasSquared.distance2d(

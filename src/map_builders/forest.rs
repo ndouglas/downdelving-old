@@ -1,5 +1,4 @@
 use super::{BuilderMap, MetaMapBuilder, TileType};
-use crate::map;
 
 pub struct YellowBrickRoad {}
 
@@ -18,7 +17,7 @@ impl YellowBrickRoad {
     fn find_exit(&self, build_data: &mut BuilderMap, seed_x: i32, seed_y: i32) -> (i32, i32) {
         let mut available_floors: Vec<(usize, f32)> = Vec::new();
         for (idx, tiletype) in build_data.map.tiles.iter().enumerate() {
-            if map::tile_walkable(*tiletype) {
+            if tiletype.is_walkable() {
                 available_floors.push((
                     idx,
                     rltk::DistanceAlg::PythagorasSquared.distance2d(
