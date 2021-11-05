@@ -1,49 +1,7 @@
 use super::{
-    AreaEndingPosition, AreaStartingPosition, BspDungeonBuilder, BuilderChain, BuilderMap,
-    CellularAutomataBuilder, CullUnreachable, DLABuilder, DistantExit, DrunkardsWalkBuilder,
-    MetaMapBuilder, NearestCorridors, PrefabBuilder, RoomBasedSpawner, RoomDrawer, RoomExploder,
-    RoomSort, RoomSorter, TileType, VoronoiSpawning, XEnd, XStart, YEnd, YStart,
+    BspDungeonBuilder, BuilderChain, BuilderMap, MetaMapBuilder, NearestCorridors,
+    RoomBasedSpawner, RoomDrawer, RoomExploder, RoomSort, RoomSorter, TileType,
 };
-
-pub fn limestone_cavern_builder(new_depth: i32, width: i32, height: i32) -> BuilderChain {
-    let mut chain = BuilderChain::new(new_depth, width, height, "Limestone Caverns");
-    chain.start_with(DrunkardsWalkBuilder::winding_passages());
-    chain.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
-    chain.with(CullUnreachable::new());
-    chain.with(AreaStartingPosition::new(XStart::LEFT, YStart::CENTER));
-    chain.with(VoronoiSpawning::new());
-    chain.with(DistantExit::new());
-    chain.with(CaveDecorator::new());
-    chain
-}
-
-pub fn limestone_deep_cavern_builder(new_depth: i32, width: i32, height: i32) -> BuilderChain {
-    let mut chain = BuilderChain::new(new_depth, width, height, "Deep Limestone Caverns");
-    chain.start_with(DLABuilder::central_attractor());
-    chain.with(AreaStartingPosition::new(XStart::LEFT, YStart::TOP));
-    chain.with(VoronoiSpawning::new());
-    chain.with(DistantExit::new());
-    chain.with(CaveDecorator::new());
-    chain.with(PrefabBuilder::sectional(
-        super::prefab_builder::prefab_sections::ORC_CAMP,
-    ));
-    chain
-}
-
-pub fn limestone_transition_builder(new_depth: i32, width: i32, height: i32) -> BuilderChain {
-    let mut chain = BuilderChain::new(new_depth, width, height, "Dwarf Fort - Upper Reaches");
-    chain.start_with(CellularAutomataBuilder::new());
-    chain.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
-    chain.with(CullUnreachable::new());
-    chain.with(AreaStartingPosition::new(XStart::LEFT, YStart::CENTER));
-    chain.with(VoronoiSpawning::new());
-    chain.with(CaveDecorator::new());
-    chain.with(CaveTransition::new());
-    chain.with(AreaStartingPosition::new(XStart::LEFT, YStart::CENTER));
-    chain.with(CullUnreachable::new());
-    chain.with(AreaEndingPosition::new(XEnd::RIGHT, YEnd::CENTER));
-    chain
-}
 
 pub struct CaveDecorator {}
 

@@ -82,6 +82,24 @@ pub enum EffectType {
     },
 }
 
+impl EffectType {
+    /// Does this effect affect entities?
+    pub fn affects_entities(&self) -> bool {
+        match self {
+            EffectType::Damage { .. } => true,
+            EffectType::WellFed => true,
+            EffectType::Healing { .. } => true,
+            EffectType::Mana { .. } => true,
+            EffectType::Confusion { .. } => true,
+            EffectType::TeleportTo { .. } => true,
+            EffectType::AttributeEffect { .. } => true,
+            EffectType::Slow { .. } => true,
+            EffectType::DamageOverTime { .. } => true,
+            _ => false,
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub enum Targets {
     Single { target: Entity },
@@ -139,23 +157,8 @@ fn target_applicator(ecs: &mut World, effect: &mut EffectSpawner) {
     }
 }
 
-fn tile_effect_hits_entities(effect: &EffectType) -> bool {
-    match effect {
-        EffectType::Damage { .. } => true,
-        EffectType::WellFed => true,
-        EffectType::Healing { .. } => true,
-        EffectType::Mana { .. } => true,
-        EffectType::Confusion { .. } => true,
-        EffectType::TeleportTo { .. } => true,
-        EffectType::AttributeEffect { .. } => true,
-        EffectType::Slow { .. } => true,
-        EffectType::DamageOverTime { .. } => true,
-        _ => false,
-    }
-}
-
 fn affect_tile(ecs: &mut World, effect: &mut EffectSpawner, tile_idx: i32) {
-    if tile_effect_hits_entities(&effect.effect_type) {
+    if effect.effect_type.affects_entities() {
         let content = crate::spatial::get_tile_content_clone(tile_idx as usize);
         content
             .iter()

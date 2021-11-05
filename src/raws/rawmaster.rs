@@ -16,13 +16,22 @@ pub fn parse_dice_string(dice: &str) -> (i32, i32, i32) {
     let mut die_bonus = 0;
     for cap in DICE_RE.captures_iter(dice) {
         if let Some(group) = cap.get(1) {
-            n_dice = group.as_str().parse::<i32>().expect("Not a digit");
+            n_dice = group
+                .as_str()
+                .parse::<i32>()
+                .expect("Not parseable as a number");
         }
         if let Some(group) = cap.get(2) {
-            die_type = group.as_str().parse::<i32>().expect("Not a digit");
+            die_type = group
+                .as_str()
+                .parse::<i32>()
+                .expect("Not parseable as a number");
         }
         if let Some(group) = cap.get(3) {
-            die_bonus = group.as_str().parse::<i32>().expect("Not a digit");
+            die_bonus = group
+                .as_str()
+                .parse::<i32>()
+                .expect("Not parseable as a number");
         }
     }
     (n_dice, die_type, die_bonus)
@@ -108,10 +117,10 @@ impl RawMaster {
 
         base_item_copy.magic = Some(super::MagicItem {
             class: match nmw.bonus {
-                2 => "rare".to_string(),
-                3 => "rare".to_string(),
-                4 => "rare".to_string(),
                 5 => "legendary".to_string(),
+                4 => "rare".to_string(),
+                3 => "rare".to_string(),
+                2 => "rare".to_string(),
                 _ => "common".to_string(),
             },
             naming: base_item_copy

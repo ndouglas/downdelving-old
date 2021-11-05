@@ -14,6 +14,7 @@ pub use map::*;
 mod player;
 mod rect;
 pub use rect::Rect;
+pub mod biome;
 mod damage_system;
 mod demos;
 mod game_system;
