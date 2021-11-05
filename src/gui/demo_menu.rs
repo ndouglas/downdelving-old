@@ -6,6 +6,7 @@ pub enum DemoMenuSelection {
     AStarPathfindingDemo,
     WalkingAroundDemo,
     FieldOfViewDemo,
+    LightingSystemDemo,
     Exit,
 }
 
@@ -26,7 +27,7 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
     let white_on_black = ColorPair::new(RGB::named(rltk::WHITE), black);
     ctx.render_xp_sprite(&assets.menu, 0, 0);
 
-    draw_batch.draw_double_box(Rect::with_size(24, 18, 31, 12), wheat_on_black);
+    draw_batch.draw_double_box(Rect::with_size(24, 18, 31, 13), wheat_on_black);
 
     draw_batch.print_color_centered(20, "Demos", yellow_on_black);
 
@@ -60,6 +61,16 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
             y,
             "Field of View",
             if selection == DemoMenuSelection::FieldOfViewDemo {
+                magenta_on_black
+            } else {
+                white_on_black
+            },
+        );
+        y += 1;
+        draw_batch.print_color_centered(
+            y,
+            "Lighting System",
+            if selection == DemoMenuSelection::LightingSystemDemo {
                 magenta_on_black
             } else {
                 white_on_black
@@ -104,8 +115,11 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                         DemoMenuSelection::FieldOfViewDemo => {
                             newselection = DemoMenuSelection::WalkingAroundDemo
                         }
-                        DemoMenuSelection::Exit => {
+                        DemoMenuSelection::LightingSystemDemo => {
                             newselection = DemoMenuSelection::FieldOfViewDemo
+                        }
+                        DemoMenuSelection::Exit => {
+                            newselection = DemoMenuSelection::LightingSystemDemo
                         }
                     }
                     return DemoMenuResult::NoSelection {
@@ -122,6 +136,9 @@ pub fn demo_menu(gs: &mut State, ctx: &mut Rltk) -> DemoMenuResult {
                             newselection = DemoMenuSelection::FieldOfViewDemo
                         }
                         DemoMenuSelection::FieldOfViewDemo => {
+                            newselection = DemoMenuSelection::LightingSystemDemo
+                        }
+                        DemoMenuSelection::LightingSystemDemo => {
                             newselection = DemoMenuSelection::Exit
                         }
                         DemoMenuSelection::Exit => {
