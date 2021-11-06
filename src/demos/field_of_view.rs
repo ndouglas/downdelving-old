@@ -142,12 +142,16 @@ impl DemoState {
             if xy.1 == 0 {
                 continue;
             }
-            let glyph = get_tile_renderable(i, &self.map);
-            let mut fg = glyph.1;
+            let renderable = get_tile_renderable(i, &self.map);
+            let mut fg = renderable.fg;
             if !self.map.visible_tiles[i] {
                 fg = fg.to_greyscale();
             }
-            draw_batch.set(Point::new(xy.0, xy.1), ColorPair::new(fg, glyph.2), glyph.0);
+            draw_batch.set(
+                Point::new(xy.0, xy.1),
+                ColorPair::new(fg, renderable.bg),
+                renderable.glyph,
+            );
         }
 
         match ctx.key {

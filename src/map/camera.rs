@@ -36,8 +36,12 @@ pub fn render_camera(ecs: &World, ctx: &mut Rltk) {
             if tx > 0 && tx < map_width && ty > 0 && ty < map_height {
                 let idx = map.xy_idx(tx, ty);
                 if map.revealed_tiles[idx] {
-                    let (glyph, fg, bg) = get_tile_renderable(idx, &*map);
-                    draw_batch.set(Point::new(x + 1, y + 1), ColorPair::new(fg, bg), glyph);
+                    let renderable = get_tile_renderable(idx, &*map);
+                    draw_batch.set(
+                        Point::new(x + 1, y + 1),
+                        ColorPair::new(renderable.fg, renderable.bg),
+                        renderable.glyph,
+                    );
                 }
             } else if SHOW_BOUNDARIES {
                 draw_batch.set(
@@ -147,8 +151,14 @@ pub fn render_debug_map(map: &Map, ctx: &mut Rltk) {
             if tx > 0 && tx < map_width && ty > 0 && ty < map_height {
                 let idx = map.xy_idx(tx, ty);
                 if map.revealed_tiles[idx] {
-                    let (glyph, fg, bg) = get_tile_renderable(idx, &*map);
-                    ctx.set(x as i32, y as i32, fg, bg, glyph);
+                    let renderable = get_tile_renderable(idx, &*map);
+                    ctx.set(
+                        x as i32,
+                        y as i32,
+                        renderable.fg,
+                        renderable.bg,
+                        renderable.glyph,
+                    );
                 }
             } else if SHOW_BOUNDARIES {
                 ctx.set(
