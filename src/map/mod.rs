@@ -109,30 +109,30 @@ impl BaseMap for Map {
 
         // Cardinal directions
         if self.is_exit_valid(x - 1, y) {
-            exits.push((idx - 1, tt.cost()))
+            exits.push((idx - 1, tt.get_movement_cost()))
         };
         if self.is_exit_valid(x + 1, y) {
-            exits.push((idx + 1, tt.cost()))
+            exits.push((idx + 1, tt.get_movement_cost()))
         };
         if self.is_exit_valid(x, y - 1) {
-            exits.push((idx - w, tt.cost()))
+            exits.push((idx - w, tt.get_movement_cost()))
         };
         if self.is_exit_valid(x, y + 1) {
-            exits.push((idx + w, tt.cost()))
+            exits.push((idx + w, tt.get_movement_cost()))
         };
 
         // Diagonals
         if self.is_exit_valid(x - 1, y - 1) {
-            exits.push(((idx - w) - 1, tt.cost() * DIAGONAL_COST));
+            exits.push(((idx - w) - 1, tt.get_movement_cost() * DIAGONAL_COST));
         }
         if self.is_exit_valid(x + 1, y - 1) {
-            exits.push(((idx - w) + 1, tt.cost() * DIAGONAL_COST));
+            exits.push(((idx - w) + 1, tt.get_movement_cost() * DIAGONAL_COST));
         }
         if self.is_exit_valid(x - 1, y + 1) {
-            exits.push(((idx + w) - 1, tt.cost() * DIAGONAL_COST));
+            exits.push(((idx + w) - 1, tt.get_movement_cost() * DIAGONAL_COST));
         }
         if self.is_exit_valid(x + 1, y + 1) {
-            exits.push(((idx + w) + 1, tt.cost() * DIAGONAL_COST));
+            exits.push(((idx + w) + 1, tt.get_movement_cost() * DIAGONAL_COST));
         }
 
         exits

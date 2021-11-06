@@ -1,6 +1,7 @@
+use rltk::RGB;
+
 use super::{Map, TileType};
 use crate::components::Renderable;
-use rltk::RGB;
 
 pub fn get_tile_renderable(idx: usize, map: &Map) -> Renderable {
     let mut result = match map.depth {

@@ -40,7 +40,7 @@ impl TileType {
         }
     }
 
-    pub fn cost(self: TileType) -> f32 {
+    pub fn get_movement_cost(self: TileType) -> f32 {
         match self {
             TileType::Road => 0.8,
             TileType::Grass => 1.1,
